@@ -211,7 +211,7 @@ const addTitleSlide = (pptx: pptxgen, deck: DeckContent, template: Template) => 
   slide.background = { color: template.colors.bg };
   slide.addShape(pptxgen.ShapeType.rect, { x: 0, y: 0, w: 3.1, h: 7.5, fill: { color: template.colors.accent }, line: { color: template.colors.accent } });
   slide.addShape(pptxgen.ShapeType.rect, { x: 0.45, y: 0.6, w: 2.2, h: 0.12, fill: { color: template.colors.accent2 }, line: { color: template.colors.accent2 } });
-  slide.addText(template.scenario.toUpperCase(), { x: 3.65, y: 1.2, w: 7.8, h: 0.32, fontFace: "Aptos", fontSize: 12, bold: true, color: template.colors.accent, charSpace: 1.8 });
+  slide.addText(template.scenario.toUpperCase(), { x: 3.65, y: 1.2, w: 7.8, h: 0.32, fontFace: "Aptos", fontSize: 12, bold: true, color: template.colors.accent });
   slide.addText(deck.title, { x: 3.6, y: 1.72, w: 8.5, h: 1.55, fontFace: "Aptos Display", fontSize: 42, bold: true, color: template.colors.ink, breakLine: false, fit: "shrink" });
   slide.addText(deck.subtitle, { x: 3.65, y: 3.55, w: 7.1, h: 0.65, fontFace: "Aptos", fontSize: 16, color: template.colors.muted, fit: "shrink" });
   slide.addText(`${deck.sections.length} content slides`, { x: 3.65, y: 5.7, w: 2.6, h: 0.34, fontFace: "Aptos", fontSize: 13, bold: true, color: template.colors.ink });
@@ -252,11 +252,9 @@ const createPresentation = async (deck: DeckContent, template: Template) => {
   pptx.subject = template.scenario;
   pptx.title = deck.title;
   pptx.company = "Lovable";
-  pptx.lang = "en-US";
   pptx.theme = {
     headFontFace: "Aptos Display",
     bodyFontFace: "Aptos",
-    lang: "en-US",
   };
 
   addTitleSlide(pptx, deck, template);
