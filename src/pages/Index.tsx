@@ -713,6 +713,11 @@ const Index = () => {
     window.setTimeout(() => setCopyStatus(""), 1800);
   };
 
+  const useStarterJson = () => {
+    setJsonText(starterJson);
+    setError("");
+  };
+
   return (
     <main className="min-h-screen bg-background text-foreground">
       <section className="border-b bg-[radial-gradient(circle_at_top_left,hsl(var(--accent)),transparent_28%),linear-gradient(135deg,hsl(var(--background)),hsl(var(--muted)))]">
@@ -740,10 +745,26 @@ const Index = () => {
                 <p className="text-sm font-bold">JSON input</p>
                 <p className="text-xs text-muted-foreground">Supports layouts, image prompts, metrics, comparisons, steps, cards and matrix rows.</p>
               </div>
-              <label className="inline-flex cursor-pointer items-center gap-2 border border-border bg-secondary px-3 py-2 text-sm font-semibold text-secondary-foreground transition-colors hover:bg-accent">
-                <Upload className="h-4 w-4" /> Upload
-                <input className="sr-only" type="file" accept="application/json,.json" onChange={handleUpload} />
-              </label>
+              <div className="flex flex-wrap gap-2">
+                <button type="button" onClick={useStarterJson} className="inline-flex items-center gap-2 border border-border bg-secondary px-3 py-2 text-sm font-semibold text-secondary-foreground transition-colors hover:bg-accent"><FileJson className="h-4 w-4" /> Starter</button>
+                <label className="inline-flex cursor-pointer items-center gap-2 border border-border bg-secondary px-3 py-2 text-sm font-semibold text-secondary-foreground transition-colors hover:bg-accent">
+                  <Upload className="h-4 w-4" /> Upload
+                  <input className="sr-only" type="file" accept="application/json,.json" onChange={handleUpload} />
+                </label>
+              </div>
+            </div>
+            <div className="mb-3 grid gap-3 border border-border bg-muted/50 p-3 text-xs leading-5 text-muted-foreground md:grid-cols-[0.85fr_1.15fr]">
+              <div>
+                <p className="font-black text-foreground">How JSON should look</p>
+                <p className="mt-1">Use one object with <span className="font-mono">title</span>, <span className="font-mono">subtitle</span>, and a <span className="font-mono">slides</span> array. Every slide needs a <span className="font-mono">layout</span> and <span className="font-mono">title</span>.</p>
+              </div>
+              <pre className="overflow-auto border border-border bg-background p-2 font-mono text-[11px] text-foreground">{`{
+  "title": "Presentation title",
+  "subtitle": "Short cover subtitle",
+  "slides": [
+    { "layout": "bullets", "title": "Overview", "bullets": ["Point 1", "Point 2"] }
+  ]
+}`}</pre>
             </div>
             <textarea
               value={jsonText}
