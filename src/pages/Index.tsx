@@ -550,7 +550,7 @@ const createPresentation = async (deck: DeckContent, template: Template) => {
   await pptx.writeFile({ fileName });
 };
 
-const buildPrompt = () => `Create valid JSON for a PowerPoint presentation that will be imported into a JSON-to-PPT web app.
+const buildPrompt = () => `Create one valid JSON object for a PowerPoint presentation that will be imported into a JSON-to-PPT web app.
 
 Topic: [replace with topic]
 Audience: [replace with audience]
@@ -559,41 +559,57 @@ Optional materials: [paste notes, article text, curriculum, resume, data, transc
 
 Return only valid JSON. Do not add markdown, comments, explanations, trailing commas, undefined values, or text outside the JSON.
 
-For the top-level fields do this:
-- For "title": write the main presentation title. Keep it clear and specific.
-- For "subtitle": write one short cover-page support line with audience, angle, or outcome.
-- For "slides": create as many slide objects as the topic needs. Do not force a fixed slide count.
+Required top-level JSON shape:
+{
+  "title": "Presentation title",
+  "subtitle": "Short subtitle for the cover page",
+  "slides": []
+}
 
-For every slide object do this:
-- For "layout": choose the best value from the supported layout list below. You may choose one layout per slide, repeat useful layouts, skip layouts that do not fit, or combine supported fields when helpful. It is not forced to use every layout.
-- For "title": write the slide headline, not a full sentence paragraph.
-- For "subtitle": add optional context only when it helps.
-- For "bullets": use short strings. Avoid long paragraphs because they can overflow in generated PPT slides.
-- For "steps": use ordered milestones, phases, workflow steps, or timeline events.
-- For "comparison": use balanced items for pros/cons, before/after, option A vs B, or alternatives.
-- For "metrics": use measurable facts, KPIs, dates, counts, findings, or proof points.
-- For "cards": use compact ideas, features, modules, or brainstorm notes.
-- For "columns": use table headers or comparison column names.
-- For "rows": use short row values. Keep each row readable.
-- For "imagePrompt": describe the image placeholder that should appear on the slide. Use this when the slide needs a product screenshot, diagram, person, place, chart, process visual, or source-material image.
+Uniform slide object shape:
+{
+  "layout": "choose-one-supported-layout",
+  "title": "Slide title",
+  "subtitle": "Optional short context",
+  "bullets": ["Short point", "Short point"],
+  "imagePrompt": "Optional image description"
+}
 
-Supported content fields the app can read:
-- Top-level: "title", "subtitle", "slides".
-- Slide basics: "layout", "title", "subtitle", "notes".
-- List content: "bullets", "points", "items", "details", "takeaways".
-- Visual placeholders: "imagePrompt", "visual", "visualPrompt", "image", "imageUrl".
-- Structured layouts: "comparison", "compare", "options", "steps", "timeline", "milestones", "process", "metrics", "stats", "kpis", "cards", "ideas", "features", "columns", "headers", "rows", "table", "matrix".
+Uniform JSON rules:
+1. Use exactly one top-level object with "title", "subtitle", and "slides".
+2. Use "slides" as an array. Do not use random names like "sections", "pages", or "deck".
+3. Every item inside "slides" must be an object.
+4. Every slide must include "layout" and "title".
+5. Choose one layout value per slide from the supported layout list below.
+6. Do not force every field onto every slide. Only add fields that match the chosen layout.
+7. Use arrays of short strings for "bullets", "steps", "comparison", "metrics", "cards", "columns", and "rows".
+8. Keep text short because long paragraphs can overflow in generated PowerPoint slides.
+9. If an image is needed but no real image URL/file is available, use "imagePrompt".
+10. If source materials are provided, summarize them into the JSON structure. Do not invent unsupported facts.
 
-Supported layout outlines. The AI can choose or combine these as the content fits. For each slide, pick the layout that best communicates the material. Follow the proportion/shape of the JSON code example, but adapt the actual words to the topic:
+Supported fields this app understands:
+- Required top-level fields: "title", "subtitle", "slides".
+- Required slide fields: "layout", "title".
+- Optional slide fields: "subtitle", "notes", "bullets", "steps", "comparison", "metrics", "cards", "columns", "rows", "imagePrompt".
+- Also accepted aliases: "points", "items", "details", "takeaways", "visual", "visualPrompt", "image", "imageUrl", "compare", "options", "timeline", "milestones", "process", "stats", "kpis", "ideas", "features", "headers", "table", "matrix".
+
+How to choose layouts:
+- Pick the layout that communicates the content best.
+- You may repeat useful layouts.
+- You may skip layouts that do not fit.
+- You may combine supported fields when helpful, for example an "image" slide can also include "bullets".
+- It is not required to use every layout.
+
+Supported layout guide with uniform code examples:
 ${layoutOutlines.map((layout) => `
-For layout "${layout.id}" (${layout.name}) do this:
-- Purpose: ${layout.prompt}
-- Useful outline types: ${layoutVariants[layout.id].join("; ")}
-- Fields/proportion: ${layout.fields}
-- JSON code example:
+Layout: "${layout.id}" (${layout.name})
+Use for: ${layout.description}
+Best fields: ${layout.fields}
+Possible outline types: ${layoutVariants[layout.id].join("; ")}
+Code example:
 ${layoutJsonExamples[layout.id]}`).join("\n")}
 
-Example 1: a mixed business/report deck can use metrics, comparison, timeline, image, and proposal slides together:
+Full example JSON using several layouts together:
 {
   "title": "Market Expansion Plan",
   "subtitle": "Opportunities, risks, and launch priorities",
@@ -606,7 +622,7 @@ Example 1: a mixed business/report deck can use metrics, comparison, timeline, i
   ]
 }
 
-Example 2: an education/training deck can use cover, cards, process, matrix, and bullets:
+Second example JSON for learning or training content:
 {
   "title": "Introduction to Renewable Energy",
   "subtitle": "Training deck for first-year engineering students",
@@ -618,32 +634,12 @@ Example 2: an education/training deck can use cover, cards, process, matrix, and
   ]
 }
 
-Use this JSON shape:
-{
-  "title": "Presentation title",
-  "subtitle": "Short subtitle for the cover page",
-  "slides": [
-    {
-      "layout": "choose-one-supported-layout",
-      "title": "Slide title",
-      "subtitle": "Optional context line",
-      "bullets": ["Short point", "Short point", "Short point"],
-      "steps": ["Step or milestone", "Step or milestone"],
-      "comparison": ["Option A point", "Option B point"],
-      "metrics": ["42%: KPI label", "$1.2M: business result"],
-      "cards": ["Card idea", "Card idea", "Card idea", "Card idea"],
-      "columns": ["Column A", "Column B", "Column C"],
-      "rows": ["Row value", "Row value"],
-      "imagePrompt": "A clear description for an image placeholder"
-    }
-  ]
-}
-
-Avoid generation problems:
+Common mistakes to avoid:
 - Every slide must be an object inside the "slides" array.
 - Arrays must contain strings, not nested objects, unless the information is converted into readable text.
 - Keep titles, bullets, metrics, cards, rows, and comparisons concise so the generated PPT does not clip text.
-- If source materials are provided, summarize and structure them; do not invent unsupported facts.
+- Do not add explanations before or after the JSON.
+- Do not wrap the JSON in markdown code fences.
 - If an image is mentioned but no image file is available, write an "imagePrompt" instead of an image URL.`;
 
 const MiniLayoutPreview = ({ outline, template }: { outline: Outline; template: Template }) => {
