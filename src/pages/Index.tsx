@@ -825,12 +825,12 @@ const Index = () => {
               </div>
               <h1 className="max-w-2xl text-4xl font-black leading-tight tracking-normal md:text-6xl">Generate adaptable slide decks from structured JSON.</h1>
               <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground md:text-lg">
-                Upload or paste JSON, choose from 20 templates across six UI styles, map content into layout outlines, then download a finished `.pptx` file.
+                Upload or paste JSON, choose from 20 templates across six UI styles, mix and duplicate layout outlines as needed, then download a finished `.pptx` file.
               </p>
             </div>
             <div className="mt-8 grid max-w-xl grid-cols-3 border border-border bg-card">
               <div className="border-r border-border p-4"><p className="text-2xl font-black">20</p><p className="text-xs text-muted-foreground">templates</p></div>
-              <div className="border-r border-border p-4"><p className="text-2xl font-black">12</p><p className="text-xs text-muted-foreground">layout outlines</p></div>
+              <div className="border-r border-border p-4"><p className="text-2xl font-black">17</p><p className="text-xs text-muted-foreground">layout outlines</p></div>
               <div className="p-4"><p className="text-2xl font-black">.pptx</p><p className="text-xs text-muted-foreground">download</p></div>
             </div>
           </div>
@@ -945,7 +945,7 @@ const Index = () => {
           <div className="mb-5 flex items-end justify-between gap-4">
             <div>
               <h2 className="text-2xl font-black tracking-normal">Supported layout outlines</h2>
-              <p className="text-sm text-muted-foreground">Use these `layout` values in JSON to control slide structure, from comparisons to image placeholders.</p>
+              <p className="text-sm text-muted-foreground">Use these `layout` values as building blocks. Mix, duplicate and arrange them based on each slide’s content.</p>
             </div>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -974,7 +974,7 @@ const Index = () => {
           <p className="mt-3 text-sm leading-6 text-muted-foreground">The prompt explains the exact JSON shape, uniform slide rules, supported fields, layout options and optional source-material instructions.</p>
           <div className="mt-5 border border-border bg-card p-4">
             <p className="text-sm font-black">Prompt format</p>
-            <p className="mt-2 text-sm text-muted-foreground">Neutral JSON command · 12 supported layouts · copyable examples</p>
+            <p className="mt-2 text-sm text-muted-foreground">Neutral JSON command · 17 supported layouts · copyable examples</p>
           </div>
         </div>
         <div className="border border-border bg-card p-4">
