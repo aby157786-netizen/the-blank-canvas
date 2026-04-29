@@ -1,5 +1,4 @@
 import { ChangeEvent, useMemo, useState } from "react";
-import { saveAs } from "file-saver";
 import pptxgen from "pptxgenjs";
 import {
   BarChart3,
@@ -260,8 +259,8 @@ const createPresentation = async (deck: DeckContent, template: Template) => {
   addTitleSlide(pptx, deck, template);
   deck.sections.forEach((section, index) => addContentSlide(pptx, section, template, index + 1));
 
-  const blob = await pptx.write({ outputType: "blob" });
-  saveAs(blob as Blob, `${deck.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "presentation"}-${template.id}.pptx`);
+  const fileName = `${deck.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "presentation"}-${template.id}.pptx`;
+  await pptx.writeFile({ fileName });
 };
 
 const Index = () => {
@@ -297,7 +296,8 @@ const Index = () => {
       const normalized = normalizeDeck(jsonText);
       await createPresentation(normalized, activeTemplate);
     } catch (caught) {
-      setError(caught instanceof SyntaxError ? "The JSON could not be parsed. Check quotes, commas, and brackets." : "Could not generate the presentation from this JSON.");
+      console.error("PPT generation failed", caught);
+      setError(caught instanceof SyntaxError ? "The JSON could not be parsed. Check quotes, commas, and brackets." : caught instanceof Error ? caught.message : "Could not generate the presentation from this JSON.");
     } finally {
       setIsGenerating(false);
     }
