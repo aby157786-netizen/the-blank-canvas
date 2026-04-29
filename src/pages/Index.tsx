@@ -234,20 +234,40 @@ const templates: Template[] = [
   { id: "creative", name: "Studio Concept", scenario: "Creative", uiStyle: "Classic", bestFor: "Campaign ideas and visual concepts", icon: Palette, layoutBias: ["image", "idea-wall", "cards"], colors: { bg: "201A2E", ink: "FFF7ED", muted: "E9D5FF", panel: "382B4A", accent: "FB7185", accent2: "FBBF24", border: "6B4B84", shadow: "120D1A" } },
 ];
 
-const sampleJson = JSON.stringify(
+const starterJson = JSON.stringify(
   {
-    title: "Quarterly Growth Plan",
-    subtitle: "A JSON-powered deck generated in the browser",
+    title: "Presentation title",
+    subtitle: "Short subtitle for the cover page",
     slides: [
-      { layout: "metrics", title: "Executive snapshot", metrics: ["Revenue +18% QoQ", "Pipeline 3.4x coverage", "Retention +6 pts"], bullets: ["Self-serve acquisition accelerated", "Enterprise conversion needs a sharper proof path"] },
-      { layout: "comparison", title: "Strategic options", comparison: ["Expand vertical campaigns", "Run pricing experiment", "Create weekly KPI review", "Refresh onboarding path"] },
-      { layout: "timeline", title: "Launch roadmap", steps: ["Week 1: Segment ICP data", "Week 2: Publish campaign assets", "Week 3: Run pricing test", "Week 4: Review conversion"], imagePrompt: "Team reviewing a go-to-market roadmap on a large wall display" },
-      { layout: "image", title: "Customer moment", imagePrompt: "A customer success team onboarding an enterprise client", bullets: ["Show faster setup", "Highlight guided activation", "Reserve space for a product screenshot"] },
+      {
+        layout: "bullets",
+        title: "Overview",
+        subtitle: "Optional short context",
+        bullets: ["Short point 1", "Short point 2", "Short point 3"],
+      },
+      {
+        layout: "metrics",
+        title: "Important numbers",
+        metrics: ["42%: result or KPI", "12 weeks: timeline", "$1.2M: impact"],
+      },
+      {
+        layout: "comparison",
+        title: "Options compared",
+        comparison: ["Option A: strength", "Option A: risk", "Option B: strength", "Option B: risk"],
+      },
+      {
+        layout: "image",
+        title: "Visual slide",
+        imagePrompt: "Describe the image, chart, diagram, screenshot, or scene needed here",
+        bullets: ["Caption point", "Why this visual matters"],
+      },
     ],
   },
   null,
   2,
 );
+
+const sampleJson = starterJson;
 
 const safeText = (value: unknown, fallback = "Untitled") => {
   if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
