@@ -234,20 +234,40 @@ const templates: Template[] = [
   { id: "creative", name: "Studio Concept", scenario: "Creative", uiStyle: "Classic", bestFor: "Campaign ideas and visual concepts", icon: Palette, layoutBias: ["image", "idea-wall", "cards"], colors: { bg: "201A2E", ink: "FFF7ED", muted: "E9D5FF", panel: "382B4A", accent: "FB7185", accent2: "FBBF24", border: "6B4B84", shadow: "120D1A" } },
 ];
 
-const sampleJson = JSON.stringify(
+const starterJson = JSON.stringify(
   {
-    title: "Quarterly Growth Plan",
-    subtitle: "A JSON-powered deck generated in the browser",
+    title: "Presentation title",
+    subtitle: "Short subtitle for the cover page",
     slides: [
-      { layout: "metrics", title: "Executive snapshot", metrics: ["Revenue +18% QoQ", "Pipeline 3.4x coverage", "Retention +6 pts"], bullets: ["Self-serve acquisition accelerated", "Enterprise conversion needs a sharper proof path"] },
-      { layout: "comparison", title: "Strategic options", comparison: ["Expand vertical campaigns", "Run pricing experiment", "Create weekly KPI review", "Refresh onboarding path"] },
-      { layout: "timeline", title: "Launch roadmap", steps: ["Week 1: Segment ICP data", "Week 2: Publish campaign assets", "Week 3: Run pricing test", "Week 4: Review conversion"], imagePrompt: "Team reviewing a go-to-market roadmap on a large wall display" },
-      { layout: "image", title: "Customer moment", imagePrompt: "A customer success team onboarding an enterprise client", bullets: ["Show faster setup", "Highlight guided activation", "Reserve space for a product screenshot"] },
+      {
+        layout: "bullets",
+        title: "Overview",
+        subtitle: "Optional short context",
+        bullets: ["Short point 1", "Short point 2", "Short point 3"],
+      },
+      {
+        layout: "metrics",
+        title: "Important numbers",
+        metrics: ["42%: result or KPI", "12 weeks: timeline", "$1.2M: impact"],
+      },
+      {
+        layout: "comparison",
+        title: "Options compared",
+        comparison: ["Option A: strength", "Option A: risk", "Option B: strength", "Option B: risk"],
+      },
+      {
+        layout: "image",
+        title: "Visual slide",
+        imagePrompt: "Describe the image, chart, diagram, screenshot, or scene needed here",
+        bullets: ["Caption point", "Why this visual matters"],
+      },
     ],
   },
   null,
   2,
 );
+
+const sampleJson = starterJson;
 
 const safeText = (value: unknown, fallback = "Untitled") => {
   if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
@@ -530,7 +550,7 @@ const createPresentation = async (deck: DeckContent, template: Template) => {
   await pptx.writeFile({ fileName });
 };
 
-const buildPrompt = () => `Create valid JSON for a PowerPoint presentation that will be imported into a JSON-to-PPT web app.
+const buildPrompt = () => `Create one valid JSON object for a PowerPoint presentation that will be imported into a JSON-to-PPT web app.
 
 Topic: [replace with topic]
 Audience: [replace with audience]
@@ -539,41 +559,57 @@ Optional materials: [paste notes, article text, curriculum, resume, data, transc
 
 Return only valid JSON. Do not add markdown, comments, explanations, trailing commas, undefined values, or text outside the JSON.
 
-For the top-level fields do this:
-- For "title": write the main presentation title. Keep it clear and specific.
-- For "subtitle": write one short cover-page support line with audience, angle, or outcome.
-- For "slides": create as many slide objects as the topic needs. Do not force a fixed slide count.
+Required top-level JSON shape:
+{
+  "title": "Presentation title",
+  "subtitle": "Short subtitle for the cover page",
+  "slides": []
+}
 
-For every slide object do this:
-- For "layout": choose the best value from the supported layout list below. You may choose one layout per slide, repeat useful layouts, skip layouts that do not fit, or combine supported fields when helpful. It is not forced to use every layout.
-- For "title": write the slide headline, not a full sentence paragraph.
-- For "subtitle": add optional context only when it helps.
-- For "bullets": use short strings. Avoid long paragraphs because they can overflow in generated PPT slides.
-- For "steps": use ordered milestones, phases, workflow steps, or timeline events.
-- For "comparison": use balanced items for pros/cons, before/after, option A vs B, or alternatives.
-- For "metrics": use measurable facts, KPIs, dates, counts, findings, or proof points.
-- For "cards": use compact ideas, features, modules, or brainstorm notes.
-- For "columns": use table headers or comparison column names.
-- For "rows": use short row values. Keep each row readable.
-- For "imagePrompt": describe the image placeholder that should appear on the slide. Use this when the slide needs a product screenshot, diagram, person, place, chart, process visual, or source-material image.
+Uniform slide object shape:
+{
+  "layout": "choose-one-supported-layout",
+  "title": "Slide title",
+  "subtitle": "Optional short context",
+  "bullets": ["Short point", "Short point"],
+  "imagePrompt": "Optional image description"
+}
 
-Supported content fields the app can read:
-- Top-level: "title", "subtitle", "slides".
-- Slide basics: "layout", "title", "subtitle", "notes".
-- List content: "bullets", "points", "items", "details", "takeaways".
-- Visual placeholders: "imagePrompt", "visual", "visualPrompt", "image", "imageUrl".
-- Structured layouts: "comparison", "compare", "options", "steps", "timeline", "milestones", "process", "metrics", "stats", "kpis", "cards", "ideas", "features", "columns", "headers", "rows", "table", "matrix".
+Uniform JSON rules:
+1. Use exactly one top-level object with "title", "subtitle", and "slides".
+2. Use "slides" as an array. Do not use random names like "sections", "pages", or "deck".
+3. Every item inside "slides" must be an object.
+4. Every slide must include "layout" and "title".
+5. Choose one layout value per slide from the supported layout list below.
+6. Do not force every field onto every slide. Only add fields that match the chosen layout.
+7. Use arrays of short strings for "bullets", "steps", "comparison", "metrics", "cards", "columns", and "rows".
+8. Keep text short because long paragraphs can overflow in generated PowerPoint slides.
+9. If an image is needed but no real image URL/file is available, use "imagePrompt".
+10. If source materials are provided, summarize them into the JSON structure. Do not invent unsupported facts.
 
-Supported layout outlines. The AI can choose or combine these as the content fits. For each slide, pick the layout that best communicates the material. Follow the proportion/shape of the JSON code example, but adapt the actual words to the topic:
+Supported fields this app understands:
+- Required top-level fields: "title", "subtitle", "slides".
+- Required slide fields: "layout", "title".
+- Optional slide fields: "subtitle", "notes", "bullets", "steps", "comparison", "metrics", "cards", "columns", "rows", "imagePrompt".
+- Also accepted aliases: "points", "items", "details", "takeaways", "visual", "visualPrompt", "image", "imageUrl", "compare", "options", "timeline", "milestones", "process", "stats", "kpis", "ideas", "features", "headers", "table", "matrix".
+
+How to choose layouts:
+- Pick the layout that communicates the content best.
+- You may repeat useful layouts.
+- You may skip layouts that do not fit.
+- You may combine supported fields when helpful, for example an "image" slide can also include "bullets".
+- It is not required to use every layout.
+
+Supported layout guide with uniform code examples:
 ${layoutOutlines.map((layout) => `
-For layout "${layout.id}" (${layout.name}) do this:
-- Purpose: ${layout.prompt}
-- Useful outline types: ${layoutVariants[layout.id].join("; ")}
-- Fields/proportion: ${layout.fields}
-- JSON code example:
+Layout: "${layout.id}" (${layout.name})
+Use for: ${layout.description}
+Best fields: ${layout.fields}
+Possible outline types: ${layoutVariants[layout.id].join("; ")}
+Code example:
 ${layoutJsonExamples[layout.id]}`).join("\n")}
 
-Example 1: a mixed business/report deck can use metrics, comparison, timeline, image, and proposal slides together:
+Full example JSON using several layouts together:
 {
   "title": "Market Expansion Plan",
   "subtitle": "Opportunities, risks, and launch priorities",
@@ -586,7 +622,7 @@ Example 1: a mixed business/report deck can use metrics, comparison, timeline, i
   ]
 }
 
-Example 2: an education/training deck can use cover, cards, process, matrix, and bullets:
+Second example JSON for learning or training content:
 {
   "title": "Introduction to Renewable Energy",
   "subtitle": "Training deck for first-year engineering students",
@@ -598,32 +634,12 @@ Example 2: an education/training deck can use cover, cards, process, matrix, and
   ]
 }
 
-Use this JSON shape:
-{
-  "title": "Presentation title",
-  "subtitle": "Short subtitle for the cover page",
-  "slides": [
-    {
-      "layout": "choose-one-supported-layout",
-      "title": "Slide title",
-      "subtitle": "Optional context line",
-      "bullets": ["Short point", "Short point", "Short point"],
-      "steps": ["Step or milestone", "Step or milestone"],
-      "comparison": ["Option A point", "Option B point"],
-      "metrics": ["42%: KPI label", "$1.2M: business result"],
-      "cards": ["Card idea", "Card idea", "Card idea", "Card idea"],
-      "columns": ["Column A", "Column B", "Column C"],
-      "rows": ["Row value", "Row value"],
-      "imagePrompt": "A clear description for an image placeholder"
-    }
-  ]
-}
-
-Avoid generation problems:
+Common mistakes to avoid:
 - Every slide must be an object inside the "slides" array.
 - Arrays must contain strings, not nested objects, unless the information is converted into readable text.
 - Keep titles, bullets, metrics, cards, rows, and comparisons concise so the generated PPT does not clip text.
-- If source materials are provided, summarize and structure them; do not invent unsupported facts.
+- Do not add explanations before or after the JSON.
+- Do not wrap the JSON in markdown code fences.
 - If an image is mentioned but no image file is available, write an "imagePrompt" instead of an image URL.`;
 
 const MiniLayoutPreview = ({ outline, template }: { outline: Outline; template: Template }) => {
@@ -655,7 +671,6 @@ const Index = () => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const activeTemplate = templates.find((template) => template.id === selectedTemplate) ?? templates[0];
-  const activeOutline = layoutOutlines.find((outline) => outline.id === selectedOutline) ?? layoutOutlines[0];
   const aiPrompt = useMemo(() => buildPrompt(), []);
   const filteredTemplates = selectedStyle === "All" ? templates : templates.filter((template) => template.uiStyle === selectedStyle);
   const deck = useMemo(() => {
@@ -697,6 +712,11 @@ const Index = () => {
     window.setTimeout(() => setCopyStatus(""), 1800);
   };
 
+  const useStarterJson = () => {
+    setJsonText(starterJson);
+    setError("");
+  };
+
   return (
     <main className="min-h-screen bg-background text-foreground">
       <section className="border-b bg-[radial-gradient(circle_at_top_left,hsl(var(--accent)),transparent_28%),linear-gradient(135deg,hsl(var(--background)),hsl(var(--muted)))]">
@@ -724,10 +744,26 @@ const Index = () => {
                 <p className="text-sm font-bold">JSON input</p>
                 <p className="text-xs text-muted-foreground">Supports layouts, image prompts, metrics, comparisons, steps, cards and matrix rows.</p>
               </div>
-              <label className="inline-flex cursor-pointer items-center gap-2 border border-border bg-secondary px-3 py-2 text-sm font-semibold text-secondary-foreground transition-colors hover:bg-accent">
-                <Upload className="h-4 w-4" /> Upload
-                <input className="sr-only" type="file" accept="application/json,.json" onChange={handleUpload} />
-              </label>
+              <div className="flex flex-wrap gap-2">
+                <button type="button" onClick={useStarterJson} className="inline-flex items-center gap-2 border border-border bg-secondary px-3 py-2 text-sm font-semibold text-secondary-foreground transition-colors hover:bg-accent"><FileJson className="h-4 w-4" /> Starter</button>
+                <label className="inline-flex cursor-pointer items-center gap-2 border border-border bg-secondary px-3 py-2 text-sm font-semibold text-secondary-foreground transition-colors hover:bg-accent">
+                  <Upload className="h-4 w-4" /> Upload
+                  <input className="sr-only" type="file" accept="application/json,.json" onChange={handleUpload} />
+                </label>
+              </div>
+            </div>
+            <div className="mb-3 grid gap-3 border border-border bg-muted/50 p-3 text-xs leading-5 text-muted-foreground md:grid-cols-[0.85fr_1.15fr]">
+              <div>
+                <p className="font-black text-foreground">How JSON should look</p>
+                <p className="mt-1">Use one object with <span className="font-mono">title</span>, <span className="font-mono">subtitle</span>, and a <span className="font-mono">slides</span> array. Every slide needs a <span className="font-mono">layout</span> and <span className="font-mono">title</span>.</p>
+              </div>
+              <pre className="overflow-auto border border-border bg-background p-2 font-mono text-[11px] text-foreground">{`{
+  "title": "Presentation title",
+  "subtitle": "Short cover subtitle",
+  "slides": [
+    { "layout": "bullets", "title": "Overview", "bullets": ["Point 1", "Point 2"] }
+  ]
+}`}</pre>
             </div>
             <textarea
               value={jsonText}
@@ -838,10 +874,10 @@ const Index = () => {
         <div>
           <div className="mb-4 inline-flex items-center gap-2 border border-border bg-card px-3 py-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground"><Sparkles className="h-4 w-4 text-primary" /> Prompt builder</div>
           <h2 className="text-2xl font-black tracking-normal">Copy a prompt for another AI to create compatible JSON.</h2>
-          <p className="mt-3 text-sm leading-6 text-muted-foreground">The prompt includes the selected template, UI style, layout outline, supported fields and instructions for optional source materials.</p>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">The prompt explains the exact JSON shape, uniform slide rules, supported fields, layout options and optional source-material instructions.</p>
           <div className="mt-5 border border-border bg-card p-4">
-            <p className="text-sm font-black">Current prompt target</p>
-            <p className="mt-2 text-sm text-muted-foreground">{activeTemplate.name} · {activeTemplate.uiStyle} · {activeOutline.name}</p>
+            <p className="text-sm font-black">Prompt format</p>
+            <p className="mt-2 text-sm text-muted-foreground">Neutral JSON command · 12 supported layouts · copyable examples</p>
           </div>
         </div>
         <div className="border border-border bg-card p-4">
