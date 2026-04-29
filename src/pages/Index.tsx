@@ -875,10 +875,10 @@ const Index = () => {
         <div>
           <div className="mb-4 inline-flex items-center gap-2 border border-border bg-card px-3 py-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground"><Sparkles className="h-4 w-4 text-primary" /> Prompt builder</div>
           <h2 className="text-2xl font-black tracking-normal">Copy a prompt for another AI to create compatible JSON.</h2>
-          <p className="mt-3 text-sm leading-6 text-muted-foreground">The prompt includes the selected template, UI style, layout outline, supported fields and instructions for optional source materials.</p>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">The prompt explains the exact JSON shape, uniform slide rules, supported fields, layout options and optional source-material instructions.</p>
           <div className="mt-5 border border-border bg-card p-4">
-            <p className="text-sm font-black">Current prompt target</p>
-            <p className="mt-2 text-sm text-muted-foreground">{activeTemplate.name} · {activeTemplate.uiStyle} · {activeOutline.name}</p>
+            <p className="text-sm font-black">Prompt format</p>
+            <p className="mt-2 text-sm text-muted-foreground">Neutral JSON command · 12 supported layouts · copyable examples</p>
           </div>
         </div>
         <div className="border border-border bg-card p-4">
