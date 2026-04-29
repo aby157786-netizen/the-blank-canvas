@@ -231,14 +231,14 @@ const addContentSlide = (pptx: pptxgen, item: SlideContent, template: Template, 
     const row = cols === 2 ? Math.floor(bulletIndex / 2) : bulletIndex;
     const x = 0.72 + col * 6.05;
     const y = 1.72 + row * 1.08;
-    slide.addShape(pptxgen.ShapeType.roundRect, { x, y, w: cardW, h: 0.78, rectRadius: 0.05, fill: { color: template.colors.panel, transparency: 0 }, line: { color: template.colors.panel } });
-    slide.addShape(pptxgen.ShapeType.ellipse, { x: x + 0.2, y: y + 0.2, w: 0.34, h: 0.34, fill: { color: bulletIndex % 2 ? template.colors.accent2 : template.colors.accent }, line: { color: bulletIndex % 2 ? template.colors.accent2 : template.colors.accent } });
+    slide.addShape("roundRect", { x, y, w: cardW, h: 0.78, rectRadius: 0.05, fill: { color: template.colors.panel, transparency: 0 }, line: { color: template.colors.panel } });
+    slide.addShape("ellipse", { x: x + 0.2, y: y + 0.2, w: 0.34, h: 0.34, fill: { color: bulletIndex % 2 ? template.colors.accent2 : template.colors.accent }, line: { color: bulletIndex % 2 ? template.colors.accent2 : template.colors.accent } });
     slide.addText(bullet, { x: x + 0.72, y: y + 0.16, w: cardW - 1.0, h: 0.44, fontFace: "Aptos", fontSize: 13, color: template.colors.ink, fit: "shrink", breakLine: false });
   });
 
   if (["timeline", "proposal", "report"].includes(template.id)) {
-    slide.addShape(pptxgen.ShapeType.line, { x: 9.85, y: 1.6, w: 0, h: 4.6, line: { color: template.colors.accent, width: 2 } });
-    [0, 1, 2].forEach((dot) => slide.addShape(pptxgen.ShapeType.ellipse, { x: 9.68, y: 1.8 + dot * 1.85, w: 0.34, h: 0.34, fill: { color: template.colors.accent2 }, line: { color: template.colors.accent2 } }));
+    slide.addShape("line", { x: 9.85, y: 1.6, w: 0, h: 4.6, line: { color: template.colors.accent, width: 2 } });
+    [0, 1, 2].forEach((dot) => slide.addShape("ellipse", { x: 9.68, y: 1.8 + dot * 1.85, w: 0.34, h: 0.34, fill: { color: template.colors.accent2 }, line: { color: template.colors.accent2 } }));
   }
 
   addFooter(slide, template, index);
