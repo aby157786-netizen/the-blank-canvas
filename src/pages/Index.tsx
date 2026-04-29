@@ -625,8 +625,9 @@ Your final answer must be JSON only. Do not write an introduction, explanation, 
 Think of the deck like this:
 1. The whole presentation is one JSON object.
 2. The object has a main "title", a short "subtitle", and a "slides" array.
-3. Each item inside "slides" is one PowerPoint slide.
-4. Each slide chooses one layout, then uses only the fields that make sense for that layout.
+3. Inside "slides", every pair of curly braces { ... } is one slide only.
+4. Each slide object must choose one "layout" value from the supported layout outlines.
+5. After choosing the layout, add only the inputs that belong to that layout. Different layouts use different inputs.
 5. Layouts are not a fixed template order. You can use them together in one PPT, duplicate the same layout many times, skip layouts, or rearrange them based on the content.
 
 The required overall structure is:
@@ -635,6 +636,7 @@ The required overall structure is:
   "subtitle": "Short subtitle for the cover page",
   "slides": [
     {
+      "notes": "Slide 1: this one curly-brace object makes one slide. Choose layout first.",
       "layout": "bullets",
       "title": "Slide title",
       "subtitle": "Optional short context",
@@ -643,6 +645,22 @@ The required overall structure is:
     }
   ]
 }
+
+Important: JSON does not allow real comments like // comment. If you want to explain an example, use a "notes" field as a simple comment. The app can read it, and the JSON stays valid.
+
+Simple slide-building method:
+1. Start a new slide with { } inside the "slides" array.
+2. Put "layout" first so the slide knows which outline to use.
+3. Add "title" for the slide headline.
+4. Add the matching input for that layout:
+   - "bullets" layout → use "bullets": ["point", "point"]
+   - "process" or "timeline" layout → use "steps": ["step", "step"]
+   - "metrics" layout → use "metrics": ["number: meaning", "number: meaning"]
+   - "comparison" layout → use "comparison": ["A: detail", "B: detail"]
+   - "cards" or "idea-wall" layout → use "cards": ["card", "card"]
+   - "matrix" layout → use "columns" and "rows"
+   - "image" or "content-caption" layout → use "imagePrompt" and optional "bullets"
+5. If the next slide needs the same kind of structure, duplicate the slide object and change the content.
 
 Natural writing rules for this JSON:
 - Use clear, human slide titles. A title should sound like a slide headline, not a long paragraph.
