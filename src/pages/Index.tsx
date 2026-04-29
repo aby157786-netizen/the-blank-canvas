@@ -545,7 +545,7 @@ For the top-level fields do this:
 - For "slides": create as many slide objects as the topic needs. Do not force a fixed slide count.
 
 For every slide object do this:
-- For "layout": choose the best value from the supported layout list below. It is not forced to use every layout; use layouts only where they fit the content.
+- For "layout": choose the best value from the supported layout list below. You may choose one layout per slide, repeat useful layouts, skip layouts that do not fit, or combine supported fields when helpful. It is not forced to use every layout.
 - For "title": write the slide headline, not a full sentence paragraph.
 - For "subtitle": add optional context only when it helps.
 - For "bullets": use short strings. Avoid long paragraphs because they can overflow in generated PPT slides.
@@ -557,14 +557,46 @@ For every slide object do this:
 - For "rows": use short row values. Keep each row readable.
 - For "imagePrompt": describe the image placeholder that should appear on the slide. Use this when the slide needs a product screenshot, diagram, person, place, chart, process visual, or source-material image.
 
-Supported layout outlines. For each type, follow the proportion/shape of the JSON example, but adapt the content to the topic:
+Supported content fields the app can read:
+- Top-level: "title", "subtitle", "slides".
+- Slide basics: "layout", "title", "subtitle", "notes".
+- List content: "bullets", "points", "items", "details", "takeaways".
+- Visual placeholders: "imagePrompt", "visual", "visualPrompt", "image", "imageUrl".
+- Structured layouts: "comparison", "compare", "options", "steps", "timeline", "milestones", "process", "metrics", "stats", "kpis", "cards", "ideas", "features", "columns", "headers", "rows", "table", "matrix".
+
+Supported layout outlines. The AI can choose or combine these as the content fits. For each slide, pick the layout that best communicates the material. Follow the proportion/shape of the JSON code example, but adapt the actual words to the topic:
 ${layoutOutlines.map((layout) => `
 For layout "${layout.id}" (${layout.name}) do this:
 - Purpose: ${layout.prompt}
 - Useful outline types: ${layoutVariants[layout.id].join("; ")}
 - Fields/proportion: ${layout.fields}
-- JSON code proportion:
+- JSON code example:
 ${layoutJsonExamples[layout.id]}`).join("\n")}
+
+Example 1: a mixed business/report deck can use metrics, comparison, timeline, image, and proposal slides together:
+{
+  "title": "Market Expansion Plan",
+  "subtitle": "Opportunities, risks, and launch priorities",
+  "slides": [
+    { "layout": "metrics", "title": "Current position", "metrics": ["18%: revenue growth", "3.4x: pipeline coverage", "6 pts: retention lift"] },
+    { "layout": "comparison", "title": "Expansion options", "comparison": ["Enterprise: higher ACV", "Enterprise: longer sales cycle", "SMB: faster adoption", "SMB: higher churn risk"] },
+    { "layout": "timeline", "title": "Launch roadmap", "steps": ["Month 1: validate segment", "Month 2: build campaign", "Month 3: pilot", "Month 4: scale"] },
+    { "layout": "image", "title": "Customer workflow", "imagePrompt": "Diagram showing the customer journey from signup to activation", "bullets": ["Show friction points", "Highlight activation moment"] },
+    { "layout": "proposal", "title": "Recommended next move", "bullets": ["Start with enterprise pilot", "Use current case studies", "Review results after 45 days"] }
+  ]
+}
+
+Example 2: an education/training deck can use cover, cards, process, matrix, and bullets:
+{
+  "title": "Introduction to Renewable Energy",
+  "subtitle": "Training deck for first-year engineering students",
+  "slides": [
+    { "layout": "cards", "title": "Energy source types", "cards": ["Solar", "Wind", "Hydro", "Geothermal"] },
+    { "layout": "process", "title": "How solar power is generated", "steps": ["Sunlight hits panels", "Cells create DC current", "Inverter converts power", "Grid distributes energy"] },
+    { "layout": "matrix", "title": "Compare sources", "columns": ["Source", "Strength", "Limitation", "Best use"], "rows": ["Solar", "Wind", "Hydro", "Geothermal"] },
+    { "layout": "bullets", "title": "Key takeaways", "bullets": ["Renewables reduce emissions", "Storage improves reliability", "Best source depends on location"] }
+  ]
+}
 
 Use this JSON shape:
 {
