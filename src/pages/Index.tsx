@@ -51,6 +51,11 @@ type UiStyle = "Classic" | "Skeuomorphism" | "Neobrutalism" | "Glassmorphism" | 
 
 type LayoutType =
   | "cover"
+  | "title-content"
+  | "section-header"
+  | "two-content"
+  | "title-only"
+  | "content-caption"
   | "bullets"
   | "comparison"
   | "timeline"
@@ -116,8 +121,37 @@ type Outline = {
 
 const layoutJsonExamples: Record<LayoutType, string> = {
   cover: `{
+  "layout": "cover",
   "title": "Topic title",
   "subtitle": "Audience + promise"
+}`,
+  "title-content": `{
+  "layout": "title-content",
+  "title": "Main idea",
+  "subtitle": "Short context line",
+  "bullets": ["Supporting idea 1", "Supporting idea 2", "Supporting idea 3"]
+}`,
+  "section-header": `{
+  "layout": "section-header",
+  "title": "Section title",
+  "subtitle": "What this section will explain next"
+}`,
+  "two-content": `{
+  "layout": "two-content",
+  "title": "Two related content blocks",
+  "columns": ["Left side topic", "Right side topic"],
+  "bullets": ["Left detail 1", "Left detail 2", "Right detail 1", "Right detail 2"]
+}`,
+  "title-only": `{
+  "layout": "title-only",
+  "title": "Big statement or transition title",
+  "subtitle": "Optional short explanation"
+}`,
+  "content-caption": `{
+  "layout": "content-caption",
+  "title": "Visual or content focus",
+  "imagePrompt": "Describe the main image, chart, diagram, or screenshot",
+  "bullets": ["Caption insight", "Why it matters"]
 }`,
   bullets: `{
   "layout": "bullets",
@@ -137,7 +171,9 @@ const layoutJsonExamples: Record<LayoutType, string> = {
   process: `{
   "layout": "process",
   "title": "Workflow",
-  "steps": ["Step 1", "Step 2", "Step 3", "Step 4", "Step 5"]
+  "subtitle": "Short explanation shown below or near the process",
+  "steps": ["Step 1", "Step 2", "Step 3", "Step 4", "Step 5"],
+  "bullets": ["Explain the purpose of the sequence", "Add any important note below the steps"]
 }`,
   image: `{
   "layout": "image",
@@ -180,7 +216,12 @@ const layoutJsonExamples: Record<LayoutType, string> = {
 };
 
 const layoutVariants: Record<LayoutType, string[]> = {
-  cover: ["Title + audience", "Title + outcome promise", "Title + source-material context"],
+  cover: ["Centered title cover", "Title + audience", "Title + outcome promise", "Title + source-material context"],
+  "title-content": ["Title and content", "Title with explanation", "Title with short list"],
+  "section-header": ["Section divider", "Chapter opener", "Topic transition"],
+  "two-content": ["Two content columns", "Text + text blocks", "Two related lists"],
+  "title-only": ["Big transition statement", "Quote-style title", "Simple announcement"],
+  "content-caption": ["Picture with caption", "Chart with explanation", "Screenshot with notes"],
   bullets: ["Key takeaways", "Problem list", "Recommendation list"],
   comparison: ["Before vs after", "Option A vs Option B", "Pros and cons"],
   timeline: ["Date-based roadmap", "Phase-based milestones", "Past-present-future story"],
@@ -197,7 +238,12 @@ const layoutVariants: Record<LayoutType, string[]> = {
 const uiStyles: UiStyle[] = ["Classic", "Skeuomorphism", "Neobrutalism", "Glassmorphism", "Neumorphism", "Minimalism"];
 
 const layoutOutlines: Outline[] = [
-  { id: "cover", name: "Cover page", description: "Deck title, subtitle, topic and audience framing.", fields: "title, subtitle", prompt: "Create a strong cover using title and subtitle only.", icon: Presentation },
+  { id: "cover", name: "Cover page", description: "Deck title, subtitle, topic and audience framing. Can be used as the first slide or duplicated for major parts.", fields: "layout: cover, title, subtitle", prompt: "Create a strong cover using title and subtitle only. Choose a title-first, audience-first, or outcome-first arrangement.", icon: Presentation },
+  { id: "title-content", name: "Title and content", description: "Official PPT-style title with one main content area for explanation, notes or bullets.", fields: "layout: title-content, title, subtitle, bullets[]", prompt: "Use when the slide needs a title, then a clear explanation or list under it.", icon: FileJson },
+  { id: "section-header", name: "Section header", description: "Official PPT-style section divider for a new chapter, topic or theme.", fields: "layout: section-header, title, subtitle", prompt: "Use to separate the deck into parts before continuing with content slides.", icon: Layers3 },
+  { id: "two-content", name: "Two content", description: "Official PPT-style two-panel slide for two related blocks of content.", fields: "layout: two-content, columns[], bullets[]", prompt: "Use when content naturally splits into left and right groups, such as concept/details or issue/response.", icon: Columns3 },
+  { id: "title-only", name: "Title only", description: "Official PPT-style large title slide for statements, transitions or simple section messages.", fields: "layout: title-only, title, subtitle", prompt: "Use for a short transition, statement, quote-like idea, or divider with very little text.", icon: Presentation },
+  { id: "content-caption", name: "Content with caption", description: "Official PPT-style visual/content area with a small caption or explanation.", fields: "layout: content-caption, imagePrompt, bullets[]", prompt: "Use when a chart, screenshot, diagram or image needs a short caption or supporting note.", icon: Image },
   { id: "bullets", name: "Dot listing", description: "Clear title with short bullet points.", fields: "layout: bullets, bullets[]", prompt: "Use concise bullets with one idea per bullet.", icon: ListChecks },
   { id: "comparison", name: "Comparison", description: "Two-column or multi-option contrast.", fields: "layout: comparison, comparison[] or columns[]", prompt: "Create balanced comparison points for options, pros/cons, before/after, or alternatives.", icon: Columns3 },
   { id: "timeline", name: "Timeline", description: "Milestones, dates, phases or chronological progress.", fields: "layout: timeline, steps[]", prompt: "Turn the topic into ordered milestones with date or phase labels.", icon: ScrollText },
@@ -522,10 +568,10 @@ const addContentSlide = (pptx: pptxgen, item: SlideContent, template: Template, 
     slide.addShape("ellipse", { x: -0.8, y: 5.2, w: 2.5, h: 2.5, fill: { color: template.colors.accent, transparency: 55 }, line: { color: template.colors.accent, transparency: 100 } });
   }
 
-  if (layout === "comparison" || layout === "proposal") addComparisonSlide(slide, item, template);
+  if (layout === "comparison" || layout === "proposal" || layout === "two-content") addComparisonSlide(slide, item, template);
   else if (layout === "timeline") addTimelineSlide(slide, item, template);
   else if (layout === "process") addProcessSlide(slide, item, template);
-  else if (layout === "image") addImageSlide(slide, item, template);
+  else if (layout === "image" || layout === "content-caption") addImageSlide(slide, item, template);
   else if (layout === "cards" || layout === "idea-wall" || layout === "profile") addCardsSlide(slide, item, template, layout === "profile" ? "cards" : layout);
   else if (layout === "metrics") addMetricsSlide(slide, item, template);
   else if (layout === "matrix") addMatrixSlide(slide, item, template);
@@ -564,6 +610,7 @@ Think of the deck like this:
 2. The object has a main "title", a short "subtitle", and a "slides" array.
 3. Each item inside "slides" is one PowerPoint slide.
 4. Each slide chooses one layout, then uses only the fields that make sense for that layout.
+5. Layouts are not a fixed template order. You can use them together in one PPT, duplicate the same layout many times, skip layouts, or rearrange them based on the content.
 
 The required overall structure is:
 {
@@ -592,6 +639,9 @@ Natural writing rules for this JSON:
 - It is okay to skip layouts that do not fit the topic.
 - It is not required to use every layout.
 - You may combine helpful fields, for example an "image" slide can include both "imagePrompt" and "bullets".
+- Choose layouts from the content properties: use "bullets" when the content is a list, "process" or "timeline" when the content is ordered, "comparison" or "two-content" when the content has two sides, "metrics" when it has numbers, and "image" or "content-caption" when a visual is needed.
+- A deck can include more than one cover-like slide: use "cover" for the first slide, "section-header" for chapter openers, and "title-only" for simple transitions.
+- For process slides, place the main steps first, then use "subtitle" or "bullets" for the explanation above, below, or beside the steps.
 
 Supported fields:
 - Top-level fields: "title", "subtitle", "slides".
@@ -610,6 +660,7 @@ Use the standard field names when possible:
 - Use "imagePrompt" for any visual placeholder.
 
 Supported layouts and how to use them:
+Use these as building blocks. A good deck usually combines several layout values, for example: cover, section-header, title-content, bullets, two-content, process, metrics, content-caption, and proposal. If the source content repeats the same kind of information, duplicate the matching layout instead of forcing a different one.
 ${layoutOutlines.map((layout) => `
 Layout value: "${layout.id}"
 Layout name: ${layout.name}
@@ -626,9 +677,25 @@ Here is a complete example of good JSON:
   "subtitle": "Opportunities, risks, and launch priorities",
   "slides": [
     {
+      "layout": "cover",
+      "title": "Market Expansion Plan",
+      "subtitle": "Opportunities, risks, and launch priorities"
+    },
+    {
+      "layout": "section-header",
+      "title": "Where we stand",
+      "subtitle": "Current evidence before choosing the launch path"
+    },
+    {
       "layout": "metrics",
       "title": "Current position",
       "metrics": ["18%: revenue growth", "3.4x: pipeline coverage", "6 pts: retention lift"]
+    },
+    {
+      "layout": "two-content",
+      "title": "Audience signals and barriers",
+      "columns": ["Signals", "Barriers"],
+      "bullets": ["High demand in regulated teams", "Strong referral activity", "Longer procurement cycles", "More onboarding support needed"]
     },
     {
       "layout": "comparison",
@@ -639,6 +706,13 @@ Here is a complete example of good JSON:
       "layout": "timeline",
       "title": "Launch roadmap",
       "steps": ["Month 1: validate segment", "Month 2: build campaign", "Month 3: pilot", "Month 4: scale"]
+    },
+    {
+      "layout": "process",
+      "title": "Pilot operating steps",
+      "subtitle": "Run the pilot in a controlled sequence, then review before scaling.",
+      "steps": ["Select accounts", "Prepare assets", "Launch outreach", "Track adoption", "Review results"],
+      "bullets": ["Keep weekly checkpoints", "Use the same success criteria for every account"]
     },
     {
       "layout": "image",
@@ -673,13 +747,13 @@ const MiniLayoutPreview = ({ outline, template }: { outline: Outline; template: 
   return (
     <div className="mt-4 border p-2" style={{ borderColor: `#${template.colors.border}`, backgroundColor: `#${template.colors.bg}` }}>
       <div className="mb-2 h-1.5 w-2/5" style={accentStyle} />
-      {outline.id === "comparison" ? <div className="grid grid-cols-2 gap-2"><div className="h-14 border" style={panelStyle} /><div className="h-14 border" style={panelStyle} /></div> : null}
+      {outline.id === "comparison" || outline.id === "two-content" ? <div className="grid grid-cols-2 gap-2"><div className="h-14 border" style={panelStyle} /><div className="h-14 border" style={panelStyle} /></div> : null}
       {outline.id === "timeline" || outline.id === "process" ? <div className="flex items-center gap-1 py-4">{[0, 1, 2, 3].map((item) => <div key={item} className="flex flex-1 items-center gap-1"><span className="h-4 w-4 rounded-full" style={item % 2 ? accentAltStyle : accentStyle} />{item < 3 ? <span className="h-0.5 flex-1" style={panelStyle} /> : null}</div>)}</div> : null}
-      {outline.id === "image" ? <div className="grid grid-cols-[1.5fr_1fr] gap-2"><div className="flex h-16 items-center justify-center border text-[9px] font-black uppercase" style={accentStyle}>Image</div><div className="space-y-1"><div className="h-3 border" style={panelStyle} /><div className="h-3 border" style={panelStyle} /><div className="h-3 border" style={panelStyle} /></div></div> : null}
+      {outline.id === "image" || outline.id === "content-caption" ? <div className="grid grid-cols-[1.5fr_1fr] gap-2"><div className="flex h-16 items-center justify-center border text-[9px] font-black uppercase" style={accentStyle}>Image</div><div className="space-y-1"><div className="h-3 border" style={panelStyle} /><div className="h-3 border" style={panelStyle} /><div className="h-3 border" style={panelStyle} /></div></div> : null}
       {outline.id === "cards" || outline.id === "idea-wall" || outline.id === "profile" ? <div className="grid grid-cols-2 gap-2">{[0, 1, 2, 3].map((item) => <div key={item} className="h-8 border" style={item % 2 && outline.id === "idea-wall" ? accentAltStyle : panelStyle} />)}</div> : null}
       {outline.id === "metrics" ? <div className="grid grid-cols-3 gap-2">{[0, 1, 2].map((item) => <div key={item} className="h-12 border" style={item % 2 ? panelStyle : accentStyle} />)}</div> : null}
       {outline.id === "matrix" ? <div className="space-y-1">{[0, 1, 2].map((row) => <div key={row} className="grid grid-cols-4 gap-1">{[0, 1, 2, 3].map((col) => <div key={col} className="h-4 border" style={row === 0 ? accentStyle : panelStyle} />)}</div>)}</div> : null}
-      {outline.id === "cover" || outline.id === "bullets" || outline.id === "proposal" ? <div className="space-y-2 py-2"><div className="h-5 w-3/4 border" style={panelStyle} /><div className="h-2 w-full" style={accentStyle} /><div className="h-2 w-4/5" style={accentAltStyle} /><div className="h-2 w-2/3" style={panelStyle} /></div> : null}
+      {outline.id === "cover" || outline.id === "bullets" || outline.id === "proposal" || outline.id === "title-content" || outline.id === "section-header" || outline.id === "title-only" ? <div className="space-y-2 py-2"><div className="h-5 w-3/4 border" style={panelStyle} /><div className="h-2 w-full" style={accentStyle} /><div className="h-2 w-4/5" style={accentAltStyle} /><div className="h-2 w-2/3" style={panelStyle} /></div> : null}
     </div>
   );
 };
@@ -751,12 +825,12 @@ const Index = () => {
               </div>
               <h1 className="max-w-2xl text-4xl font-black leading-tight tracking-normal md:text-6xl">Generate adaptable slide decks from structured JSON.</h1>
               <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground md:text-lg">
-                Upload or paste JSON, choose from 20 templates across six UI styles, map content into layout outlines, then download a finished `.pptx` file.
+                Upload or paste JSON, choose from 20 templates across six UI styles, mix and duplicate layout outlines as needed, then download a finished `.pptx` file.
               </p>
             </div>
             <div className="mt-8 grid max-w-xl grid-cols-3 border border-border bg-card">
               <div className="border-r border-border p-4"><p className="text-2xl font-black">20</p><p className="text-xs text-muted-foreground">templates</p></div>
-              <div className="border-r border-border p-4"><p className="text-2xl font-black">12</p><p className="text-xs text-muted-foreground">layout outlines</p></div>
+              <div className="border-r border-border p-4"><p className="text-2xl font-black">17</p><p className="text-xs text-muted-foreground">layout outlines</p></div>
               <div className="p-4"><p className="text-2xl font-black">.pptx</p><p className="text-xs text-muted-foreground">download</p></div>
             </div>
           </div>
@@ -871,7 +945,7 @@ const Index = () => {
           <div className="mb-5 flex items-end justify-between gap-4">
             <div>
               <h2 className="text-2xl font-black tracking-normal">Supported layout outlines</h2>
-              <p className="text-sm text-muted-foreground">Use these `layout` values in JSON to control slide structure, from comparisons to image placeholders.</p>
+              <p className="text-sm text-muted-foreground">Use these `layout` values as building blocks. Mix, duplicate and arrange them based on each slide’s content.</p>
             </div>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -900,7 +974,7 @@ const Index = () => {
           <p className="mt-3 text-sm leading-6 text-muted-foreground">The prompt explains the exact JSON shape, uniform slide rules, supported fields, layout options and optional source-material instructions.</p>
           <div className="mt-5 border border-border bg-card p-4">
             <p className="text-sm font-black">Prompt format</p>
-            <p className="mt-2 text-sm text-muted-foreground">Neutral JSON command · 12 supported layouts · copyable examples</p>
+            <p className="mt-2 text-sm text-muted-foreground">Neutral JSON command · 17 supported layouts · copyable examples</p>
           </div>
         </div>
         <div className="border border-border bg-card p-4">
