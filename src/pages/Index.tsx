@@ -897,13 +897,18 @@ const Index = () => {
             <div className="mb-3 grid gap-3 border border-border bg-muted/50 p-3 text-xs leading-5 text-muted-foreground md:grid-cols-[0.85fr_1.15fr]">
               <div>
                 <p className="font-black text-foreground">How JSON should look</p>
-                <p className="mt-1">Use one object with <span className="font-mono">title</span>, <span className="font-mono">subtitle</span>, and a <span className="font-mono">slides</span> array. Every slide needs a <span className="font-mono">layout</span> and <span className="font-mono">title</span>.</p>
+                <p className="mt-1">Use one object with <span className="font-mono">title</span>, <span className="font-mono">subtitle</span>, and a <span className="font-mono">slides</span> array. One <span className="font-mono">{"{ }"}</span> inside slides means one slide. Choose <span className="font-mono">layout</span> first, then add only that layout’s inputs.</p>
               </div>
               <pre className="overflow-auto border border-border bg-background p-2 font-mono text-[11px] text-foreground">{`{
   "title": "Presentation title",
   "subtitle": "Short cover subtitle",
   "slides": [
-    { "layout": "bullets", "title": "Overview", "bullets": ["Point 1", "Point 2"] }
+    {
+      "notes": "Slide 1: one object = one slide",
+      "layout": "bullets",
+      "title": "Overview",
+      "bullets": ["Point 1", "Point 2"]
+    }
   ]
 }`}</pre>
             </div>
