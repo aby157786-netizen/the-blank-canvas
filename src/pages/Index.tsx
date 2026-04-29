@@ -1,5 +1,4 @@
 import { ChangeEvent, useMemo, useState } from "react";
-import { saveAs } from "file-saver";
 import pptxgen from "pptxgenjs";
 import {
   BarChart3,
@@ -202,20 +201,20 @@ const normalizeDeck = (jsonText: string): DeckContent => {
 };
 
 const addFooter = (slide: pptxgen.Slide, template: Template, index: number) => {
-  slide.addShape(pptxgen.ShapeType.line, { x: 0.55, y: 6.92, w: 12.2, h: 0, line: { color: template.colors.accent, width: 1 } });
+  slide.addShape("line", { x: 0.55, y: 6.92, w: 12.2, h: 0, line: { color: template.colors.accent, width: 1 } });
   slide.addText(String(index).padStart(2, "0"), { x: 12.05, y: 6.72, w: 0.8, h: 0.25, fontFace: "Aptos", fontSize: 8, color: template.colors.muted, align: "right" });
 };
 
 const addTitleSlide = (pptx: pptxgen, deck: DeckContent, template: Template) => {
   const slide = pptx.addSlide();
   slide.background = { color: template.colors.bg };
-  slide.addShape(pptxgen.ShapeType.rect, { x: 0, y: 0, w: 3.1, h: 7.5, fill: { color: template.colors.accent }, line: { color: template.colors.accent } });
-  slide.addShape(pptxgen.ShapeType.rect, { x: 0.45, y: 0.6, w: 2.2, h: 0.12, fill: { color: template.colors.accent2 }, line: { color: template.colors.accent2 } });
+  slide.addShape("rect", { x: 0, y: 0, w: 3.1, h: 7.5, fill: { color: template.colors.accent }, line: { color: template.colors.accent } });
+  slide.addShape("rect", { x: 0.45, y: 0.6, w: 2.2, h: 0.12, fill: { color: template.colors.accent2 }, line: { color: template.colors.accent2 } });
   slide.addText(template.scenario.toUpperCase(), { x: 3.65, y: 1.2, w: 7.8, h: 0.32, fontFace: "Aptos", fontSize: 12, bold: true, color: template.colors.accent });
   slide.addText(deck.title, { x: 3.6, y: 1.72, w: 8.5, h: 1.55, fontFace: "Aptos Display", fontSize: 42, bold: true, color: template.colors.ink, breakLine: false, fit: "shrink" });
   slide.addText(deck.subtitle, { x: 3.65, y: 3.55, w: 7.1, h: 0.65, fontFace: "Aptos", fontSize: 16, color: template.colors.muted, fit: "shrink" });
   slide.addText(`${deck.sections.length} content slides`, { x: 3.65, y: 5.7, w: 2.6, h: 0.34, fontFace: "Aptos", fontSize: 13, bold: true, color: template.colors.ink });
-  slide.addShape(pptxgen.ShapeType.arc, { x: 10.9, y: 5.25, w: 1.6, h: 1.6, line: { color: template.colors.accent2, width: 5, transparency: 12 } });
+  slide.addShape("arc", { x: 10.9, y: 5.25, w: 1.6, h: 1.6, line: { color: template.colors.accent2, width: 5, transparency: 12 } });
 };
 
 const addContentSlide = (pptx: pptxgen, item: SlideContent, template: Template, index: number) => {
@@ -232,14 +231,14 @@ const addContentSlide = (pptx: pptxgen, item: SlideContent, template: Template, 
     const row = cols === 2 ? Math.floor(bulletIndex / 2) : bulletIndex;
     const x = 0.72 + col * 6.05;
     const y = 1.72 + row * 1.08;
-    slide.addShape(pptxgen.ShapeType.roundRect, { x, y, w: cardW, h: 0.78, rectRadius: 0.05, fill: { color: template.colors.panel, transparency: 0 }, line: { color: template.colors.panel } });
-    slide.addShape(pptxgen.ShapeType.ellipse, { x: x + 0.2, y: y + 0.2, w: 0.34, h: 0.34, fill: { color: bulletIndex % 2 ? template.colors.accent2 : template.colors.accent }, line: { color: bulletIndex % 2 ? template.colors.accent2 : template.colors.accent } });
+    slide.addShape("roundRect", { x, y, w: cardW, h: 0.78, rectRadius: 0.05, fill: { color: template.colors.panel, transparency: 0 }, line: { color: template.colors.panel } });
+    slide.addShape("ellipse", { x: x + 0.2, y: y + 0.2, w: 0.34, h: 0.34, fill: { color: bulletIndex % 2 ? template.colors.accent2 : template.colors.accent }, line: { color: bulletIndex % 2 ? template.colors.accent2 : template.colors.accent } });
     slide.addText(bullet, { x: x + 0.72, y: y + 0.16, w: cardW - 1.0, h: 0.44, fontFace: "Aptos", fontSize: 13, color: template.colors.ink, fit: "shrink", breakLine: false });
   });
 
   if (["timeline", "proposal", "report"].includes(template.id)) {
-    slide.addShape(pptxgen.ShapeType.line, { x: 9.85, y: 1.6, w: 0, h: 4.6, line: { color: template.colors.accent, width: 2 } });
-    [0, 1, 2].forEach((dot) => slide.addShape(pptxgen.ShapeType.ellipse, { x: 9.68, y: 1.8 + dot * 1.85, w: 0.34, h: 0.34, fill: { color: template.colors.accent2 }, line: { color: template.colors.accent2 } }));
+    slide.addShape("line", { x: 9.85, y: 1.6, w: 0, h: 4.6, line: { color: template.colors.accent, width: 2 } });
+    [0, 1, 2].forEach((dot) => slide.addShape("ellipse", { x: 9.68, y: 1.8 + dot * 1.85, w: 0.34, h: 0.34, fill: { color: template.colors.accent2 }, line: { color: template.colors.accent2 } }));
   }
 
   addFooter(slide, template, index);
@@ -260,8 +259,8 @@ const createPresentation = async (deck: DeckContent, template: Template) => {
   addTitleSlide(pptx, deck, template);
   deck.sections.forEach((section, index) => addContentSlide(pptx, section, template, index + 1));
 
-  const blob = await pptx.write({ outputType: "blob" });
-  saveAs(blob as Blob, `${deck.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "presentation"}-${template.id}.pptx`);
+  const fileName = `${deck.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "presentation"}-${template.id}.pptx`;
+  await pptx.writeFile({ fileName });
 };
 
 const Index = () => {
@@ -297,7 +296,8 @@ const Index = () => {
       const normalized = normalizeDeck(jsonText);
       await createPresentation(normalized, activeTemplate);
     } catch (caught) {
-      setError(caught instanceof SyntaxError ? "The JSON could not be parsed. Check quotes, commas, and brackets." : "Could not generate the presentation from this JSON.");
+      console.error("PPT generation failed", caught);
+      setError(caught instanceof SyntaxError ? "The JSON could not be parsed. Check quotes, commas, and brackets." : caught instanceof Error ? caught.message : "Could not generate the presentation from this JSON.");
     } finally {
       setIsGenerating(false);
     }
