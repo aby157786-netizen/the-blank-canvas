@@ -546,11 +546,16 @@ For every slide object do this:
 - For "rows": use short row values. Keep each row readable.
 - For "imagePrompt": describe the image placeholder that should appear on the slide. Use this when the slide needs a product screenshot, diagram, person, place, chart, process visual, or source-material image.
 
-Supported layout types and what to do for each:
-${layoutOutlines.map((layout) => `- ${layout.id}: ${layout.prompt} Fields: ${layout.fields}.`).join("\n")}
+Supported layout outlines. For each type, follow the proportion/shape of the JSON example, but adapt the content to the topic:
+${layoutOutlines.map((layout) => `
+For layout "${layout.id}" (${layout.name}) do this:
+- Purpose: ${layout.prompt}
+- Fields/proportion: ${layout.fields}
+- JSON code proportion:
+${layoutJsonExamples[layout.id]}`).join("\n")}
 
 Design/template guidance:
-${templates.map((item) => `- ${item.name} (${item.scenario}, ${item.uiStyle}): best for ${item.bestFor}. Prefer these layouts when useful: ${item.layoutBias.join(", ")}.`).join("\n")}
+${templates.map((item) => `- For the ${item.name} theme (${item.scenario}, ${item.uiStyle}), do this: use it for ${item.bestFor}; prefer ${item.layoutBias.join(", ")} when useful; match the theme with concise titles, balanced slide density, and image placeholders where visuals help.`).join("\n")}
 
 Use this JSON shape:
 {
@@ -579,6 +584,25 @@ Avoid generation problems:
 - Keep titles, bullets, metrics, cards, rows, and comparisons concise so the generated PPT does not clip text.
 - If source materials are provided, summarize and structure them; do not invent unsupported facts.
 - If an image is mentioned but no image file is available, write an "imagePrompt" instead of an image URL.`;
+
+const MiniLayoutPreview = ({ outline, template }: { outline: Outline; template: Template }) => {
+  const panelStyle = { borderColor: `#${template.colors.border}`, backgroundColor: `#${template.colors.panel}` };
+  const accentStyle = { backgroundColor: `#${template.colors.accent}` };
+  const accentAltStyle = { backgroundColor: `#${template.colors.accent2}` };
+
+  return (
+    <div className="mt-4 border p-2" style={{ borderColor: `#${template.colors.border}`, backgroundColor: `#${template.colors.bg}` }}>
+      <div className="mb-2 h-1.5 w-2/5" style={accentStyle} />
+      {outline.id === "comparison" ? <div className="grid grid-cols-2 gap-2"><div className="h-14 border" style={panelStyle} /><div className="h-14 border" style={panelStyle} /></div> : null}
+      {outline.id === "timeline" || outline.id === "process" ? <div className="flex items-center gap-1 py-4">{[0, 1, 2, 3].map((item) => <div key={item} className="flex flex-1 items-center gap-1"><span className="h-4 w-4 rounded-full" style={item % 2 ? accentAltStyle : accentStyle} />{item < 3 ? <span className="h-0.5 flex-1" style={panelStyle} /> : null}</div>)}</div> : null}
+      {outline.id === "image" ? <div className="grid grid-cols-[1.5fr_1fr] gap-2"><div className="flex h-16 items-center justify-center border text-[9px] font-black uppercase" style={accentStyle}>Image</div><div className="space-y-1"><div className="h-3 border" style={panelStyle} /><div className="h-3 border" style={panelStyle} /><div className="h-3 border" style={panelStyle} /></div></div> : null}
+      {outline.id === "cards" || outline.id === "idea-wall" || outline.id === "profile" ? <div className="grid grid-cols-2 gap-2">{[0, 1, 2, 3].map((item) => <div key={item} className="h-8 border" style={item % 2 && outline.id === "idea-wall" ? accentAltStyle : panelStyle} />)}</div> : null}
+      {outline.id === "metrics" ? <div className="grid grid-cols-3 gap-2">{[0, 1, 2].map((item) => <div key={item} className="h-12 border" style={item % 2 ? panelStyle : accentStyle} />)}</div> : null}
+      {outline.id === "matrix" ? <div className="space-y-1">{[0, 1, 2].map((row) => <div key={row} className="grid grid-cols-4 gap-1">{[0, 1, 2, 3].map((col) => <div key={col} className="h-4 border" style={row === 0 ? accentStyle : panelStyle} />)}</div>)}</div> : null}
+      {outline.id === "cover" || outline.id === "bullets" || outline.id === "proposal" ? <div className="space-y-2 py-2"><div className="h-5 w-3/4 border" style={panelStyle} /><div className="h-2 w-full" style={accentStyle} /><div className="h-2 w-4/5" style={accentAltStyle} /><div className="h-2 w-2/3" style={panelStyle} /></div> : null}
+    </div>
+  );
+};
 
 const Index = () => {
   const [jsonText, setJsonText] = useState(sampleJson);
