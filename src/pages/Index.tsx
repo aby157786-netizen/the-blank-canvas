@@ -550,97 +550,120 @@ const createPresentation = async (deck: DeckContent, template: Template) => {
   await pptx.writeFile({ fileName });
 };
 
-const buildPrompt = () => `Create one valid JSON object for a PowerPoint presentation that will be imported into a JSON-to-PPT web app.
+const buildPrompt = () => `I need you to create JSON for a PowerPoint deck. The JSON will be pasted into a JSON-to-PPT web app, so please follow this guide naturally and carefully.
 
 Topic: [replace with topic]
 Audience: [replace with audience]
 Goal: [replace with presentation goal]
-Optional materials: [paste notes, article text, curriculum, resume, data, transcript, images needed, or research here]
+Optional source materials: [paste notes, article text, curriculum, resume, data, transcript, research, or image requirements here]
 
-Return only valid JSON. Do not add markdown, comments, explanations, trailing commas, undefined values, or text outside the JSON.
+Your final answer must be JSON only. Do not write an introduction, explanation, markdown, code fence, comments, or anything outside the JSON.
 
-Required top-level JSON shape:
+Think of the deck like this:
+1. The whole presentation is one JSON object.
+2. The object has a main "title", a short "subtitle", and a "slides" array.
+3. Each item inside "slides" is one PowerPoint slide.
+4. Each slide chooses one layout, then uses only the fields that make sense for that layout.
+
+The required overall structure is:
 {
   "title": "Presentation title",
   "subtitle": "Short subtitle for the cover page",
-  "slides": []
+  "slides": [
+    {
+      "layout": "bullets",
+      "title": "Slide title",
+      "subtitle": "Optional short context",
+      "bullets": ["Short point", "Short point"],
+      "imagePrompt": "Optional image description"
+    }
+  ]
 }
 
-Uniform slide object shape:
-{
-  "layout": "choose-one-supported-layout",
-  "title": "Slide title",
-  "subtitle": "Optional short context",
-  "bullets": ["Short point", "Short point"],
-  "imagePrompt": "Optional image description"
-}
-
-Uniform JSON rules:
-1. Use exactly one top-level object with "title", "subtitle", and "slides".
-2. Use "slides" as an array. Do not use random names like "sections", "pages", or "deck".
-3. Every item inside "slides" must be an object.
-4. Every slide must include "layout" and "title".
-5. Choose one layout value per slide from the supported layout list below.
-6. Do not force every field onto every slide. Only add fields that match the chosen layout.
-7. Use arrays of short strings for "bullets", "steps", "comparison", "metrics", "cards", "columns", and "rows".
-8. Keep text short because long paragraphs can overflow in generated PowerPoint slides.
-9. If an image is needed but no real image URL/file is available, use "imagePrompt".
-10. If source materials are provided, summarize them into the JSON structure. Do not invent unsupported facts.
-
-Supported fields this app understands:
-- Required top-level fields: "title", "subtitle", "slides".
-- Required slide fields: "layout", "title".
-- Optional slide fields: "subtitle", "notes", "bullets", "steps", "comparison", "metrics", "cards", "columns", "rows", "imagePrompt".
-- Also accepted aliases: "points", "items", "details", "takeaways", "visual", "visualPrompt", "image", "imageUrl", "compare", "options", "timeline", "milestones", "process", "stats", "kpis", "ideas", "features", "headers", "table", "matrix".
-
-How to choose layouts:
-- Pick the layout that communicates the content best.
-- You may repeat useful layouts.
-- You may skip layouts that do not fit.
-- You may combine supported fields when helpful, for example an "image" slide can also include "bullets".
+Natural writing rules for this JSON:
+- Use clear, human slide titles. A title should sound like a slide headline, not a long paragraph.
+- Keep all text short because it will be placed inside PowerPoint slides.
+- Use arrays of strings, not nested objects, for slide content.
+- Do not use long paragraphs inside bullets, cards, metrics, rows, or comparison items.
+- Do not invent facts if source materials are provided. Summarize and organize what is given.
+- If a slide needs a picture, screenshot, chart, diagram, person, place, product, or scene, write an "imagePrompt" that describes what should be shown.
+- If no real image URL is provided, do not fake an image URL. Use "imagePrompt" instead.
+- It is okay to repeat layouts when they fit the topic.
+- It is okay to skip layouts that do not fit the topic.
 - It is not required to use every layout.
+- You may combine helpful fields, for example an "image" slide can include both "imagePrompt" and "bullets".
 
-Supported layout guide with uniform code examples:
+Supported fields:
+- Top-level fields: "title", "subtitle", "slides".
+- Common slide fields: "layout", "title", "subtitle", "notes".
+- List fields: "bullets", "points", "items", "details", "takeaways".
+- Visual fields: "imagePrompt", "visual", "visualPrompt", "image", "imageUrl".
+- Structured fields: "comparison", "compare", "options", "steps", "timeline", "milestones", "process", "metrics", "stats", "kpis", "cards", "ideas", "features", "columns", "headers", "rows", "table", "matrix".
+
+Use the standard field names when possible:
+- Use "bullets" for normal lists.
+- Use "steps" for process, timeline, or ordered sequence slides.
+- Use "comparison" for before/after, pros/cons, or option comparisons.
+- Use "metrics" for KPIs, numbers, findings, results, dates, or proof points.
+- Use "cards" for features, modules, ideas, chapters, or grouped concepts.
+- Use "columns" and "rows" for matrix/table-style slides.
+- Use "imagePrompt" for any visual placeholder.
+
+Supported layouts and how to use them:
 ${layoutOutlines.map((layout) => `
-Layout: "${layout.id}" (${layout.name})
-Use for: ${layout.description}
-Best fields: ${layout.fields}
-Possible outline types: ${layoutVariants[layout.id].join("; ")}
-Code example:
+Layout value: "${layout.id}"
+Layout name: ${layout.name}
+Use this when: ${layout.description}
+Good outline types: ${layoutVariants[layout.id].join("; ")}
+Best fields to use: ${layout.fields}
+Natural instruction: ${layout.prompt}
+JSON example:
 ${layoutJsonExamples[layout.id]}`).join("\n")}
 
-Full example JSON using several layouts together:
+Here is a complete example of good JSON:
 {
   "title": "Market Expansion Plan",
   "subtitle": "Opportunities, risks, and launch priorities",
   "slides": [
-    { "layout": "metrics", "title": "Current position", "metrics": ["18%: revenue growth", "3.4x: pipeline coverage", "6 pts: retention lift"] },
-    { "layout": "comparison", "title": "Expansion options", "comparison": ["Enterprise: higher ACV", "Enterprise: longer sales cycle", "SMB: faster adoption", "SMB: higher churn risk"] },
-    { "layout": "timeline", "title": "Launch roadmap", "steps": ["Month 1: validate segment", "Month 2: build campaign", "Month 3: pilot", "Month 4: scale"] },
-    { "layout": "image", "title": "Customer workflow", "imagePrompt": "Diagram showing the customer journey from signup to activation", "bullets": ["Show friction points", "Highlight activation moment"] },
-    { "layout": "proposal", "title": "Recommended next move", "bullets": ["Start with enterprise pilot", "Use current case studies", "Review results after 45 days"] }
+    {
+      "layout": "metrics",
+      "title": "Current position",
+      "metrics": ["18%: revenue growth", "3.4x: pipeline coverage", "6 pts: retention lift"]
+    },
+    {
+      "layout": "comparison",
+      "title": "Expansion options",
+      "comparison": ["Enterprise: higher ACV", "Enterprise: longer sales cycle", "SMB: faster adoption", "SMB: higher churn risk"]
+    },
+    {
+      "layout": "timeline",
+      "title": "Launch roadmap",
+      "steps": ["Month 1: validate segment", "Month 2: build campaign", "Month 3: pilot", "Month 4: scale"]
+    },
+    {
+      "layout": "image",
+      "title": "Customer workflow",
+      "imagePrompt": "Diagram showing the customer journey from signup to activation",
+      "bullets": ["Show friction points", "Highlight activation moment"]
+    },
+    {
+      "layout": "proposal",
+      "title": "Recommended next move",
+      "bullets": ["Start with enterprise pilot", "Use current case studies", "Review results after 45 days"]
+    }
   ]
 }
 
-Second example JSON for learning or training content:
-{
-  "title": "Introduction to Renewable Energy",
-  "subtitle": "Training deck for first-year engineering students",
-  "slides": [
-    { "layout": "cards", "title": "Energy source types", "cards": ["Solar", "Wind", "Hydro", "Geothermal"] },
-    { "layout": "process", "title": "How solar power is generated", "steps": ["Sunlight hits panels", "Cells create DC current", "Inverter converts power", "Grid distributes energy"] },
-    { "layout": "matrix", "title": "Compare sources", "columns": ["Source", "Strength", "Limitation", "Best use"], "rows": ["Solar", "Wind", "Hydro", "Geothermal"] },
-    { "layout": "bullets", "title": "Key takeaways", "bullets": ["Renewables reduce emissions", "Storage improves reliability", "Best source depends on location"] }
-  ]
-}
-
-Common mistakes to avoid:
-- Every slide must be an object inside the "slides" array.
-- Arrays must contain strings, not nested objects, unless the information is converted into readable text.
-- Keep titles, bullets, metrics, cards, rows, and comparisons concise so the generated PPT does not clip text.
-- Do not add explanations before or after the JSON.
-- Do not wrap the JSON in markdown code fences.
-- If an image is mentioned but no image file is available, write an "imagePrompt" instead of an image URL.`;
+Before returning the JSON, check it against this final checklist:
+- Is the answer valid JSON only?
+- Does it start with one object using "title", "subtitle", and "slides"?
+- Is "slides" an array?
+- Is every slide an object?
+- Does every slide have "layout" and "title"?
+- Are content lists arrays of short strings?
+- Are layouts chosen naturally based on the material?
+- Is any needed visual described with "imagePrompt"?
+- Are there no markdown fences, comments, trailing commas, or extra text?`;
 
 const MiniLayoutPreview = ({ outline, template }: { outline: Outline; template: Template }) => {
   const panelStyle = { borderColor: `#${template.colors.border}`, backgroundColor: `#${template.colors.panel}` };
