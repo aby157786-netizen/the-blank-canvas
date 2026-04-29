@@ -114,6 +114,71 @@ type Outline = {
   icon: typeof Presentation;
 };
 
+const layoutJsonExamples: Record<LayoutType, string> = {
+  cover: `{
+  "title": "Topic title",
+  "subtitle": "Audience + promise"
+}`,
+  bullets: `{
+  "layout": "bullets",
+  "title": "Key takeaways",
+  "bullets": ["Point 1", "Point 2", "Point 3", "Point 4"]
+}`,
+  comparison: `{
+  "layout": "comparison",
+  "title": "Option A vs Option B",
+  "comparison": ["Option A: strength", "Option A: risk", "Option B: strength", "Option B: risk"]
+}`,
+  timeline: `{
+  "layout": "timeline",
+  "title": "Roadmap",
+  "steps": ["Phase 1: discovery", "Phase 2: build", "Phase 3: launch", "Phase 4: improve"]
+}`,
+  process: `{
+  "layout": "process",
+  "title": "Workflow",
+  "steps": ["Step 1", "Step 2", "Step 3", "Step 4", "Step 5"]
+}`,
+  image: `{
+  "layout": "image",
+  "title": "Visual proof",
+  "imagePrompt": "Describe the screenshot, photo, diagram, chart, or scene to place here",
+  "bullets": ["Caption point", "Why it matters"]
+}`,
+  cards: `{
+  "layout": "cards",
+  "title": "Four modules",
+  "cards": ["Card 1", "Card 2", "Card 3", "Card 4"]
+}`,
+  metrics: `{
+  "layout": "metrics",
+  "title": "Performance snapshot",
+  "metrics": ["42%: conversion lift", "$1.2M: revenue impact", "18 days: time saved"]
+}`,
+  profile: `{
+  "layout": "profile",
+  "title": "Candidate profile",
+  "bullets": ["Role summary", "Core skill", "Experience highlight"],
+  "metrics": ["8 years: experience", "12: shipped projects"]
+}`,
+  "idea-wall": `{
+  "layout": "idea-wall",
+  "title": "Brainstorm board",
+  "cards": ["Idea 1", "Idea 2", "Idea 3", "Idea 4", "Idea 5", "Idea 6"]
+}`,
+  proposal: `{
+  "layout": "proposal",
+  "title": "Problem and solution",
+  "bullets": ["Problem", "Proposed solution", "Expected impact", "Next move"]
+}`,
+  matrix: `{
+  "layout": "matrix",
+  "title": "Decision matrix",
+  "columns": ["Criteria", "Option A", "Option B", "Decision"],
+  "rows": ["Cost", "Speed", "Risk", "Fit"]
+}`,
+};
+
 const uiStyles: UiStyle[] = ["Classic", "Skeuomorphism", "Neobrutalism", "Glassmorphism", "Neumorphism", "Minimalism"];
 
 const layoutOutlines: Outline[] = [
