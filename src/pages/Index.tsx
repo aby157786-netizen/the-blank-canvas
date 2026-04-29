@@ -114,6 +114,71 @@ type Outline = {
   icon: typeof Presentation;
 };
 
+const layoutJsonExamples: Record<LayoutType, string> = {
+  cover: `{
+  "title": "Topic title",
+  "subtitle": "Audience + promise"
+}`,
+  bullets: `{
+  "layout": "bullets",
+  "title": "Key takeaways",
+  "bullets": ["Point 1", "Point 2", "Point 3", "Point 4"]
+}`,
+  comparison: `{
+  "layout": "comparison",
+  "title": "Option A vs Option B",
+  "comparison": ["Option A: strength", "Option A: risk", "Option B: strength", "Option B: risk"]
+}`,
+  timeline: `{
+  "layout": "timeline",
+  "title": "Roadmap",
+  "steps": ["Phase 1: discovery", "Phase 2: build", "Phase 3: launch", "Phase 4: improve"]
+}`,
+  process: `{
+  "layout": "process",
+  "title": "Workflow",
+  "steps": ["Step 1", "Step 2", "Step 3", "Step 4", "Step 5"]
+}`,
+  image: `{
+  "layout": "image",
+  "title": "Visual proof",
+  "imagePrompt": "Describe the screenshot, photo, diagram, chart, or scene to place here",
+  "bullets": ["Caption point", "Why it matters"]
+}`,
+  cards: `{
+  "layout": "cards",
+  "title": "Four modules",
+  "cards": ["Card 1", "Card 2", "Card 3", "Card 4"]
+}`,
+  metrics: `{
+  "layout": "metrics",
+  "title": "Performance snapshot",
+  "metrics": ["42%: conversion lift", "$1.2M: revenue impact", "18 days: time saved"]
+}`,
+  profile: `{
+  "layout": "profile",
+  "title": "Candidate profile",
+  "bullets": ["Role summary", "Core skill", "Experience highlight"],
+  "metrics": ["8 years: experience", "12: shipped projects"]
+}`,
+  "idea-wall": `{
+  "layout": "idea-wall",
+  "title": "Brainstorm board",
+  "cards": ["Idea 1", "Idea 2", "Idea 3", "Idea 4", "Idea 5", "Idea 6"]
+}`,
+  proposal: `{
+  "layout": "proposal",
+  "title": "Problem and solution",
+  "bullets": ["Problem", "Proposed solution", "Expected impact", "Next move"]
+}`,
+  matrix: `{
+  "layout": "matrix",
+  "title": "Decision matrix",
+  "columns": ["Criteria", "Option A", "Option B", "Decision"],
+  "rows": ["Cost", "Speed", "Risk", "Fit"]
+}`,
+};
+
 const uiStyles: UiStyle[] = ["Classic", "Skeuomorphism", "Neobrutalism", "Glassmorphism", "Neumorphism", "Minimalism"];
 
 const layoutOutlines: Outline[] = [
@@ -481,11 +546,16 @@ For every slide object do this:
 - For "rows": use short row values. Keep each row readable.
 - For "imagePrompt": describe the image placeholder that should appear on the slide. Use this when the slide needs a product screenshot, diagram, person, place, chart, process visual, or source-material image.
 
-Supported layout types and what to do for each:
-${layoutOutlines.map((layout) => `- ${layout.id}: ${layout.prompt} Fields: ${layout.fields}.`).join("\n")}
+Supported layout outlines. For each type, follow the proportion/shape of the JSON example, but adapt the content to the topic:
+${layoutOutlines.map((layout) => `
+For layout "${layout.id}" (${layout.name}) do this:
+- Purpose: ${layout.prompt}
+- Fields/proportion: ${layout.fields}
+- JSON code proportion:
+${layoutJsonExamples[layout.id]}`).join("\n")}
 
 Design/template guidance:
-${templates.map((item) => `- ${item.name} (${item.scenario}, ${item.uiStyle}): best for ${item.bestFor}. Prefer these layouts when useful: ${item.layoutBias.join(", ")}.`).join("\n")}
+${templates.map((item) => `- For the ${item.name} theme (${item.scenario}, ${item.uiStyle}), do this: use it for ${item.bestFor}; prefer ${item.layoutBias.join(", ")} when useful; match the theme with concise titles, balanced slide density, and image placeholders where visuals help.`).join("\n")}
 
 Use this JSON shape:
 {
@@ -514,6 +584,25 @@ Avoid generation problems:
 - Keep titles, bullets, metrics, cards, rows, and comparisons concise so the generated PPT does not clip text.
 - If source materials are provided, summarize and structure them; do not invent unsupported facts.
 - If an image is mentioned but no image file is available, write an "imagePrompt" instead of an image URL.`;
+
+const MiniLayoutPreview = ({ outline, template }: { outline: Outline; template: Template }) => {
+  const panelStyle = { borderColor: `#${template.colors.border}`, backgroundColor: `#${template.colors.panel}` };
+  const accentStyle = { backgroundColor: `#${template.colors.accent}` };
+  const accentAltStyle = { backgroundColor: `#${template.colors.accent2}` };
+
+  return (
+    <div className="mt-4 border p-2" style={{ borderColor: `#${template.colors.border}`, backgroundColor: `#${template.colors.bg}` }}>
+      <div className="mb-2 h-1.5 w-2/5" style={accentStyle} />
+      {outline.id === "comparison" ? <div className="grid grid-cols-2 gap-2"><div className="h-14 border" style={panelStyle} /><div className="h-14 border" style={panelStyle} /></div> : null}
+      {outline.id === "timeline" || outline.id === "process" ? <div className="flex items-center gap-1 py-4">{[0, 1, 2, 3].map((item) => <div key={item} className="flex flex-1 items-center gap-1"><span className="h-4 w-4 rounded-full" style={item % 2 ? accentAltStyle : accentStyle} />{item < 3 ? <span className="h-0.5 flex-1" style={panelStyle} /> : null}</div>)}</div> : null}
+      {outline.id === "image" ? <div className="grid grid-cols-[1.5fr_1fr] gap-2"><div className="flex h-16 items-center justify-center border text-[9px] font-black uppercase" style={accentStyle}>Image</div><div className="space-y-1"><div className="h-3 border" style={panelStyle} /><div className="h-3 border" style={panelStyle} /><div className="h-3 border" style={panelStyle} /></div></div> : null}
+      {outline.id === "cards" || outline.id === "idea-wall" || outline.id === "profile" ? <div className="grid grid-cols-2 gap-2">{[0, 1, 2, 3].map((item) => <div key={item} className="h-8 border" style={item % 2 && outline.id === "idea-wall" ? accentAltStyle : panelStyle} />)}</div> : null}
+      {outline.id === "metrics" ? <div className="grid grid-cols-3 gap-2">{[0, 1, 2].map((item) => <div key={item} className="h-12 border" style={item % 2 ? panelStyle : accentStyle} />)}</div> : null}
+      {outline.id === "matrix" ? <div className="space-y-1">{[0, 1, 2].map((row) => <div key={row} className="grid grid-cols-4 gap-1">{[0, 1, 2, 3].map((col) => <div key={col} className="h-4 border" style={row === 0 ? accentStyle : panelStyle} />)}</div>)}</div> : null}
+      {outline.id === "cover" || outline.id === "bullets" || outline.id === "proposal" ? <div className="space-y-2 py-2"><div className="h-5 w-3/4 border" style={panelStyle} /><div className="h-2 w-full" style={accentStyle} /><div className="h-2 w-4/5" style={accentAltStyle} /><div className="h-2 w-2/3" style={panelStyle} /></div> : null}
+    </div>
+  );
+};
 
 const Index = () => {
   const [jsonText, setJsonText] = useState(sampleJson);
@@ -694,6 +783,8 @@ const Index = () => {
                   <div className="mb-3 flex items-center gap-2"><Icon className="h-4 w-4" /><p className="text-sm font-black">{outline.name}</p></div>
                   <p className={`text-xs leading-5 ${selected ? "text-primary-foreground/75" : "text-muted-foreground"}`}>{outline.description}</p>
                   <p className={`mt-3 font-mono text-[11px] ${selected ? "text-primary-foreground/75" : "text-muted-foreground"}`}>{outline.fields}</p>
+                  <MiniLayoutPreview outline={outline} template={activeTemplate} />
+                  <pre className={`mt-3 max-h-28 overflow-auto whitespace-pre-wrap border p-2 font-mono text-[10px] leading-4 ${selected ? "border-primary-foreground/30 bg-primary-foreground/10 text-primary-foreground/80" : "border-border bg-background text-muted-foreground"}`}>{layoutJsonExamples[outline.id]}</pre>
                 </button>
               );
             })}
