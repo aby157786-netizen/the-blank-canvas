@@ -628,7 +628,7 @@ Think of the deck like this:
 3. Inside "slides", every pair of curly braces { ... } is one slide only.
 4. Each slide object must choose one "layout" value from the supported layout outlines.
 5. After choosing the layout, add only the inputs that belong to that layout. Different layouts use different inputs.
-5. Layouts are not a fixed template order. You can use them together in one PPT, duplicate the same layout many times, skip layouts, or rearrange them based on the content.
+6. Layouts are not a fixed template order. You can use them together in one PPT, duplicate the same layout many times, skip layouts, or rearrange them based on the content.
 
 The required overall structure is:
 {
@@ -661,6 +661,7 @@ Simple slide-building method:
    - "matrix" layout → use "columns" and "rows"
    - "image" or "content-caption" layout → use "imagePrompt" and optional "bullets"
 5. If the next slide needs the same kind of structure, duplicate the slide object and change the content.
+6. Do not add every possible input to every slide. A simple slide is better.
 
 Natural writing rules for this JSON:
 - Use clear, human slide titles. A title should sound like a slide headline, not a long paragraph.
