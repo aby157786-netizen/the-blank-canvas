@@ -624,7 +624,7 @@ const Index = () => {
 
   const activeTemplate = templates.find((template) => template.id === selectedTemplate) ?? templates[0];
   const activeOutline = layoutOutlines.find((outline) => outline.id === selectedOutline) ?? layoutOutlines[0];
-  const aiPrompt = useMemo(() => buildPrompt(activeTemplate, activeOutline), [activeTemplate, activeOutline]);
+  const aiPrompt = useMemo(() => buildPrompt(), []);
   const filteredTemplates = selectedStyle === "All" ? templates : templates.filter((template) => template.uiStyle === selectedStyle);
   const deck = useMemo(() => {
     try {
