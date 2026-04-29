@@ -201,20 +201,20 @@ const normalizeDeck = (jsonText: string): DeckContent => {
 };
 
 const addFooter = (slide: pptxgen.Slide, template: Template, index: number) => {
-  slide.addShape(pptxgen.ShapeType.line, { x: 0.55, y: 6.92, w: 12.2, h: 0, line: { color: template.colors.accent, width: 1 } });
+  slide.addShape("line", { x: 0.55, y: 6.92, w: 12.2, h: 0, line: { color: template.colors.accent, width: 1 } });
   slide.addText(String(index).padStart(2, "0"), { x: 12.05, y: 6.72, w: 0.8, h: 0.25, fontFace: "Aptos", fontSize: 8, color: template.colors.muted, align: "right" });
 };
 
 const addTitleSlide = (pptx: pptxgen, deck: DeckContent, template: Template) => {
   const slide = pptx.addSlide();
   slide.background = { color: template.colors.bg };
-  slide.addShape(pptxgen.ShapeType.rect, { x: 0, y: 0, w: 3.1, h: 7.5, fill: { color: template.colors.accent }, line: { color: template.colors.accent } });
-  slide.addShape(pptxgen.ShapeType.rect, { x: 0.45, y: 0.6, w: 2.2, h: 0.12, fill: { color: template.colors.accent2 }, line: { color: template.colors.accent2 } });
+  slide.addShape("rect", { x: 0, y: 0, w: 3.1, h: 7.5, fill: { color: template.colors.accent }, line: { color: template.colors.accent } });
+  slide.addShape("rect", { x: 0.45, y: 0.6, w: 2.2, h: 0.12, fill: { color: template.colors.accent2 }, line: { color: template.colors.accent2 } });
   slide.addText(template.scenario.toUpperCase(), { x: 3.65, y: 1.2, w: 7.8, h: 0.32, fontFace: "Aptos", fontSize: 12, bold: true, color: template.colors.accent });
   slide.addText(deck.title, { x: 3.6, y: 1.72, w: 8.5, h: 1.55, fontFace: "Aptos Display", fontSize: 42, bold: true, color: template.colors.ink, breakLine: false, fit: "shrink" });
   slide.addText(deck.subtitle, { x: 3.65, y: 3.55, w: 7.1, h: 0.65, fontFace: "Aptos", fontSize: 16, color: template.colors.muted, fit: "shrink" });
   slide.addText(`${deck.sections.length} content slides`, { x: 3.65, y: 5.7, w: 2.6, h: 0.34, fontFace: "Aptos", fontSize: 13, bold: true, color: template.colors.ink });
-  slide.addShape(pptxgen.ShapeType.arc, { x: 10.9, y: 5.25, w: 1.6, h: 1.6, line: { color: template.colors.accent2, width: 5, transparency: 12 } });
+  slide.addShape("arc", { x: 10.9, y: 5.25, w: 1.6, h: 1.6, line: { color: template.colors.accent2, width: 5, transparency: 12 } });
 };
 
 const addContentSlide = (pptx: pptxgen, item: SlideContent, template: Template, index: number) => {
