@@ -179,6 +179,21 @@ const layoutJsonExamples: Record<LayoutType, string> = {
 }`,
 };
 
+const layoutVariants: Record<LayoutType, string[]> = {
+  cover: ["Title + audience", "Title + outcome promise", "Title + source-material context"],
+  bullets: ["Key takeaways", "Problem list", "Recommendation list"],
+  comparison: ["Before vs after", "Option A vs Option B", "Pros and cons"],
+  timeline: ["Date-based roadmap", "Phase-based milestones", "Past-present-future story"],
+  process: ["Step-by-step workflow", "Implementation plan", "Learning sequence"],
+  image: ["Screenshot placeholder", "Diagram placeholder", "Photo or scene placeholder"],
+  cards: ["Feature cards", "Module cards", "Chapter cards"],
+  metrics: ["KPI snapshot", "Research findings", "Impact numbers"],
+  profile: ["Resume profile", "Team profile", "Founder/operator profile"],
+  "idea-wall": ["Brainstorm notes", "Creative concepts", "Workshop clusters"],
+  proposal: ["Problem-solution", "Scope-value", "Ask-next steps"],
+  matrix: ["Feature table", "Decision table", "Evaluation scorecard"],
+};
+
 const uiStyles: UiStyle[] = ["Classic", "Skeuomorphism", "Neobrutalism", "Glassmorphism", "Neumorphism", "Minimalism"];
 
 const layoutOutlines: Outline[] = [
