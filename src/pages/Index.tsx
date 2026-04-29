@@ -791,6 +791,7 @@ const Index = () => {
                 <button key={outline.id} type="button" onClick={() => setSelectedOutline(outline.id)} className={`border p-4 text-left transition-colors ${selected ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:bg-accent"}`}>
                   <div className="mb-3 flex items-center gap-2"><Icon className="h-4 w-4" /><p className="text-sm font-black">{outline.name}</p></div>
                   <p className={`text-xs leading-5 ${selected ? "text-primary-foreground/75" : "text-muted-foreground"}`}>{outline.description}</p>
+                  <p className={`mt-3 text-[11px] font-bold uppercase tracking-wide ${selected ? "text-primary-foreground/80" : "text-muted-foreground"}`}>Types: {layoutVariants[outline.id].join(" · ")}</p>
                   <p className={`mt-3 font-mono text-[11px] ${selected ? "text-primary-foreground/75" : "text-muted-foreground"}`}>{outline.fields}</p>
                   <MiniLayoutPreview outline={outline} template={activeTemplate} />
                   <pre className={`mt-3 max-h-28 overflow-auto whitespace-pre-wrap border p-2 font-mono text-[10px] leading-4 ${selected ? "border-primary-foreground/30 bg-primary-foreground/10 text-primary-foreground/80" : "border-border bg-background text-muted-foreground"}`}>{layoutJsonExamples[outline.id]}</pre>
