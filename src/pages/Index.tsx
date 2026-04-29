@@ -530,15 +530,11 @@ const createPresentation = async (deck: DeckContent, template: Template) => {
   await pptx.writeFile({ fileName });
 };
 
-const buildPrompt = (template: Template, outline: Outline) => `Create valid JSON for a PowerPoint presentation that will be imported into a JSON-to-PPT web app.
+const buildPrompt = () => `Create valid JSON for a PowerPoint presentation that will be imported into a JSON-to-PPT web app.
 
 Topic: [replace with topic]
 Audience: [replace with audience]
 Goal: [replace with presentation goal]
-Selected design/template: ${template.name}
-Selected scenario: ${template.scenario}
-Selected UI style: ${template.uiStyle}
-Preferred layout type: ${outline.name} (${outline.id})
 Optional materials: [paste notes, article text, curriculum, resume, data, transcript, images needed, or research here]
 
 Return only valid JSON. Do not add markdown, comments, explanations, trailing commas, undefined values, or text outside the JSON.
@@ -565,12 +561,10 @@ Supported layout outlines. For each type, follow the proportion/shape of the JSO
 ${layoutOutlines.map((layout) => `
 For layout "${layout.id}" (${layout.name}) do this:
 - Purpose: ${layout.prompt}
+- Useful outline types: ${layoutVariants[layout.id].join("; ")}
 - Fields/proportion: ${layout.fields}
 - JSON code proportion:
 ${layoutJsonExamples[layout.id]}`).join("\n")}
-
-Design/template guidance:
-${templates.map((item) => `- For the ${item.name} theme (${item.scenario}, ${item.uiStyle}), do this: use it for ${item.bestFor}; prefer ${item.layoutBias.join(", ")} when useful; match the theme with concise titles, balanced slide density, and image placeholders where visuals help.`).join("\n")}
 
 Use this JSON shape:
 {
@@ -578,7 +572,7 @@ Use this JSON shape:
   "subtitle": "Short subtitle for the cover page",
   "slides": [
     {
-      "layout": "${outline.id}",
+      "layout": "choose-one-supported-layout",
       "title": "Slide title",
       "subtitle": "Optional context line",
       "bullets": ["Short point", "Short point", "Short point"],
