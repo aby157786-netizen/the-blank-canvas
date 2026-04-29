@@ -216,7 +216,12 @@ const layoutJsonExamples: Record<LayoutType, string> = {
 };
 
 const layoutVariants: Record<LayoutType, string[]> = {
-  cover: ["Title + audience", "Title + outcome promise", "Title + source-material context"],
+  cover: ["Centered title cover", "Title + audience", "Title + outcome promise", "Title + source-material context"],
+  "title-content": ["Title and content", "Title with explanation", "Title with short list"],
+  "section-header": ["Section divider", "Chapter opener", "Topic transition"],
+  "two-content": ["Two content columns", "Text + text blocks", "Two related lists"],
+  "title-only": ["Big transition statement", "Quote-style title", "Simple announcement"],
+  "content-caption": ["Picture with caption", "Chart with explanation", "Screenshot with notes"],
   bullets: ["Key takeaways", "Problem list", "Recommendation list"],
   comparison: ["Before vs after", "Option A vs Option B", "Pros and cons"],
   timeline: ["Date-based roadmap", "Phase-based milestones", "Past-present-future story"],
@@ -233,7 +238,12 @@ const layoutVariants: Record<LayoutType, string[]> = {
 const uiStyles: UiStyle[] = ["Classic", "Skeuomorphism", "Neobrutalism", "Glassmorphism", "Neumorphism", "Minimalism"];
 
 const layoutOutlines: Outline[] = [
-  { id: "cover", name: "Cover page", description: "Deck title, subtitle, topic and audience framing.", fields: "title, subtitle", prompt: "Create a strong cover using title and subtitle only.", icon: Presentation },
+  { id: "cover", name: "Cover page", description: "Deck title, subtitle, topic and audience framing. Can be used as the first slide or duplicated for major parts.", fields: "layout: cover, title, subtitle", prompt: "Create a strong cover using title and subtitle only. Choose a title-first, audience-first, or outcome-first arrangement.", icon: Presentation },
+  { id: "title-content", name: "Title and content", description: "Official PPT-style title with one main content area for explanation, notes or bullets.", fields: "layout: title-content, title, subtitle, bullets[]", prompt: "Use when the slide needs a title, then a clear explanation or list under it.", icon: FileJson },
+  { id: "section-header", name: "Section header", description: "Official PPT-style section divider for a new chapter, topic or theme.", fields: "layout: section-header, title, subtitle", prompt: "Use to separate the deck into parts before continuing with content slides.", icon: Layers3 },
+  { id: "two-content", name: "Two content", description: "Official PPT-style two-panel slide for two related blocks of content.", fields: "layout: two-content, columns[], bullets[]", prompt: "Use when content naturally splits into left and right groups, such as concept/details or issue/response.", icon: Columns3 },
+  { id: "title-only", name: "Title only", description: "Official PPT-style large title slide for statements, transitions or simple section messages.", fields: "layout: title-only, title, subtitle", prompt: "Use for a short transition, statement, quote-like idea, or divider with very little text.", icon: Presentation },
+  { id: "content-caption", name: "Content with caption", description: "Official PPT-style visual/content area with a small caption or explanation.", fields: "layout: content-caption, imagePrompt, bullets[]", prompt: "Use when a chart, screenshot, diagram or image needs a short caption or supporting note.", icon: Image },
   { id: "bullets", name: "Dot listing", description: "Clear title with short bullet points.", fields: "layout: bullets, bullets[]", prompt: "Use concise bullets with one idea per bullet.", icon: ListChecks },
   { id: "comparison", name: "Comparison", description: "Two-column or multi-option contrast.", fields: "layout: comparison, comparison[] or columns[]", prompt: "Create balanced comparison points for options, pros/cons, before/after, or alternatives.", icon: Columns3 },
   { id: "timeline", name: "Timeline", description: "Milestones, dates, phases or chronological progress.", fields: "layout: timeline, steps[]", prompt: "Turn the topic into ordered milestones with date or phase labels.", icon: ScrollText },
