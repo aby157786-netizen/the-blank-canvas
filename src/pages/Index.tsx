@@ -51,6 +51,11 @@ type UiStyle = "Classic" | "Skeuomorphism" | "Neobrutalism" | "Glassmorphism" | 
 
 type LayoutType =
   | "cover"
+  | "title-content"
+  | "section-header"
+  | "two-content"
+  | "title-only"
+  | "content-caption"
   | "bullets"
   | "comparison"
   | "timeline"
@@ -116,8 +121,37 @@ type Outline = {
 
 const layoutJsonExamples: Record<LayoutType, string> = {
   cover: `{
+  "layout": "cover",
   "title": "Topic title",
   "subtitle": "Audience + promise"
+}`,
+  "title-content": `{
+  "layout": "title-content",
+  "title": "Main idea",
+  "subtitle": "Short context line",
+  "bullets": ["Supporting idea 1", "Supporting idea 2", "Supporting idea 3"]
+}`,
+  "section-header": `{
+  "layout": "section-header",
+  "title": "Section title",
+  "subtitle": "What this section will explain next"
+}`,
+  "two-content": `{
+  "layout": "two-content",
+  "title": "Two related content blocks",
+  "columns": ["Left side topic", "Right side topic"],
+  "bullets": ["Left detail 1", "Left detail 2", "Right detail 1", "Right detail 2"]
+}`,
+  "title-only": `{
+  "layout": "title-only",
+  "title": "Big statement or transition title",
+  "subtitle": "Optional short explanation"
+}`,
+  "content-caption": `{
+  "layout": "content-caption",
+  "title": "Visual or content focus",
+  "imagePrompt": "Describe the main image, chart, diagram, or screenshot",
+  "bullets": ["Caption insight", "Why it matters"]
 }`,
   bullets: `{
   "layout": "bullets",
@@ -137,7 +171,9 @@ const layoutJsonExamples: Record<LayoutType, string> = {
   process: `{
   "layout": "process",
   "title": "Workflow",
-  "steps": ["Step 1", "Step 2", "Step 3", "Step 4", "Step 5"]
+  "subtitle": "Short explanation shown below or near the process",
+  "steps": ["Step 1", "Step 2", "Step 3", "Step 4", "Step 5"],
+  "bullets": ["Explain the purpose of the sequence", "Add any important note below the steps"]
 }`,
   image: `{
   "layout": "image",
