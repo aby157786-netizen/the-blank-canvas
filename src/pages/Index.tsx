@@ -364,7 +364,7 @@ const addProcessSlide = (slide: pptxgen.Slide, item: SlideContent, template: Tem
 const addImageSlide = (slide: pptxgen.Slide, item: SlideContent, template: Template) => {
   addTitle(slide, item, template);
   addPanel(slide, template, 0.72, 1.52, 6.25, 4.75, template.colors.panel);
-  slide.addShape("rect", { x: 1.03, y: 1.86, w: 5.64, h: 3.42, fill: { color: template.colors.accent, transparency: 12 }, line: { color: template.colors.border, dash: "dash" } });
+  slide.addShape("rect", { x: 1.03, y: 1.86, w: 5.64, h: 3.42, fill: { color: template.colors.accent, transparency: 12 }, line: { color: template.colors.border, transparency: 20 } });
   slide.addText("IMAGE PLACEHOLDER", { x: 1.65, y: 3.12, w: 4.4, h: 0.3, fontFace: "Aptos", fontSize: 15, bold: true, color: template.colors.bg, align: "center", margin: 0 });
   slide.addText(item.imagePrompt || item.image || "Add image prompt or source URL in the JSON.", { x: 1.2, y: 5.55, w: 5.28, h: 0.32, fontFace: "Aptos", fontSize: 10, color: template.colors.muted, fit: "shrink", margin: 0 });
   getPrimaryItems(item, "bullets").slice(0, 4).forEach((bullet, i) => slide.addText(bullet, { x: 7.35, y: 1.72 + i * 0.9, w: 4.3, h: 0.42, fontFace: "Aptos", fontSize: 14, color: template.colors.ink, fit: "shrink", margin: 0.02 }));
