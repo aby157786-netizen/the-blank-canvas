@@ -286,22 +286,39 @@ const starterJson = JSON.stringify(
     subtitle: "Short subtitle for the cover page",
     slides: [
       {
+        notes: "Slide 1: one curly-brace object equals one slide. Choose layout first, then use the inputs for that layout.",
+        layout: "cover",
+        title: "Presentation title",
+        subtitle: "Audience + purpose",
+      },
+      {
+        notes: "Slide 2: bullets layout uses bullets[] for dot listing content.",
         layout: "bullets",
         title: "Overview",
-        subtitle: "Optional short context",
         bullets: ["Short point 1", "Short point 2", "Short point 3"],
       },
       {
+        notes: "Slide 3: metrics layout uses metrics[] for numbers, KPIs, dates, or proof points.",
         layout: "metrics",
         title: "Important numbers",
         metrics: ["42%: result or KPI", "12 weeks: timeline", "$1.2M: impact"],
       },
       {
+        notes: "Slide 4: process layout uses steps[] first, then optional bullets[] for explanation below or around the steps.",
+        layout: "process",
+        title: "How it works",
+        subtitle: "Simple explanation before the steps",
+        steps: ["Step 1: start", "Step 2: build", "Step 3: review", "Step 4: launch"],
+        bullets: ["Keep each step short", "Use bullets only for extra explanation"],
+      },
+      {
+        notes: "Slide 5: comparison layout uses comparison[] when content has two sides, options, pros/cons, or before/after.",
         layout: "comparison",
         title: "Options compared",
         comparison: ["Option A: strength", "Option A: risk", "Option B: strength", "Option B: risk"],
       },
       {
+        notes: "Slide 6: image layout uses imagePrompt instead of a fake image URL.",
         layout: "image",
         title: "Visual slide",
         imagePrompt: "Describe the image, chart, diagram, screenshot, or scene needed here",
@@ -608,9 +625,10 @@ Your final answer must be JSON only. Do not write an introduction, explanation, 
 Think of the deck like this:
 1. The whole presentation is one JSON object.
 2. The object has a main "title", a short "subtitle", and a "slides" array.
-3. Each item inside "slides" is one PowerPoint slide.
-4. Each slide chooses one layout, then uses only the fields that make sense for that layout.
-5. Layouts are not a fixed template order. You can use them together in one PPT, duplicate the same layout many times, skip layouts, or rearrange them based on the content.
+3. Inside "slides", every pair of curly braces { ... } is one slide only.
+4. Each slide object must choose one "layout" value from the supported layout outlines.
+5. After choosing the layout, add only the inputs that belong to that layout. Different layouts use different inputs.
+6. Layouts are not a fixed template order. You can use them together in one PPT, duplicate the same layout many times, skip layouts, or rearrange them based on the content.
 
 The required overall structure is:
 {
@@ -618,6 +636,7 @@ The required overall structure is:
   "subtitle": "Short subtitle for the cover page",
   "slides": [
     {
+      "notes": "Slide 1: this one curly-brace object makes one slide. Choose layout first.",
       "layout": "bullets",
       "title": "Slide title",
       "subtitle": "Optional short context",
@@ -626,6 +645,23 @@ The required overall structure is:
     }
   ]
 }
+
+Important: JSON does not allow real comments like // comment. If you want to explain an example, use a "notes" field as a simple comment. The app can read it, and the JSON stays valid.
+
+Simple slide-building method:
+1. Start a new slide with { } inside the "slides" array.
+2. Put "layout" first so the slide knows which outline to use.
+3. Add "title" for the slide headline.
+4. Add the matching input for that layout:
+   - "bullets" layout → use "bullets": ["point", "point"]
+   - "process" or "timeline" layout → use "steps": ["step", "step"]
+   - "metrics" layout → use "metrics": ["number: meaning", "number: meaning"]
+   - "comparison" layout → use "comparison": ["A: detail", "B: detail"]
+   - "cards" or "idea-wall" layout → use "cards": ["card", "card"]
+   - "matrix" layout → use "columns" and "rows"
+   - "image" or "content-caption" layout → use "imagePrompt" and optional "bullets"
+5. If the next slide needs the same kind of structure, duplicate the slide object and change the content.
+6. Do not add every possible input to every slide. A simple slide is better.
 
 Natural writing rules for this JSON:
 - Use clear, human slide titles. A title should sound like a slide headline, not a long paragraph.
@@ -671,43 +707,50 @@ Natural instruction: ${layout.prompt}
 JSON example:
 ${layoutJsonExamples[layout.id]}`).join("\n")}
 
-Here is a complete example of good JSON:
+Here is a complete example of good JSON. Notice: every { } inside "slides" is one slide, and the "notes" field is used like an easy comment so the JSON stays valid:
 {
   "title": "Market Expansion Plan",
   "subtitle": "Opportunities, risks, and launch priorities",
   "slides": [
     {
+      "notes": "Slide 1: cover layout uses only title and subtitle.",
       "layout": "cover",
       "title": "Market Expansion Plan",
       "subtitle": "Opportunities, risks, and launch priorities"
     },
     {
+      "notes": "Slide 2: section-header layout starts a new part of the PPT.",
       "layout": "section-header",
       "title": "Where we stand",
       "subtitle": "Current evidence before choosing the launch path"
     },
     {
+      "notes": "Slide 3: metrics layout needs metrics[] because the content is numbers.",
       "layout": "metrics",
       "title": "Current position",
       "metrics": ["18%: revenue growth", "3.4x: pipeline coverage", "6 pts: retention lift"]
     },
     {
+      "notes": "Slide 4: two-content layout uses columns[] plus bullets[] split between the two sides.",
       "layout": "two-content",
       "title": "Audience signals and barriers",
       "columns": ["Signals", "Barriers"],
       "bullets": ["High demand in regulated teams", "Strong referral activity", "Longer procurement cycles", "More onboarding support needed"]
     },
     {
+      "notes": "Slide 5: comparison layout is for options, pros/cons, or before/after.",
       "layout": "comparison",
       "title": "Expansion options",
       "comparison": ["Enterprise: higher ACV", "Enterprise: longer sales cycle", "SMB: faster adoption", "SMB: higher churn risk"]
     },
     {
+      "notes": "Slide 6: timeline layout uses steps[] in time order.",
       "layout": "timeline",
       "title": "Launch roadmap",
       "steps": ["Month 1: validate segment", "Month 2: build campaign", "Month 3: pilot", "Month 4: scale"]
     },
     {
+      "notes": "Slide 7: process layout uses steps[] on top and bullets[] for explanation below.",
       "layout": "process",
       "title": "Pilot operating steps",
       "subtitle": "Run the pilot in a controlled sequence, then review before scaling.",
@@ -715,12 +758,14 @@ Here is a complete example of good JSON:
       "bullets": ["Keep weekly checkpoints", "Use the same success criteria for every account"]
     },
     {
+      "notes": "Slide 8: image layout uses imagePrompt when there is no real image file or URL.",
       "layout": "image",
       "title": "Customer workflow",
       "imagePrompt": "Diagram showing the customer journey from signup to activation",
       "bullets": ["Show friction points", "Highlight activation moment"]
     },
     {
+      "notes": "Slide 9: proposal layout uses bullets[] for problem, solution, value, and next move.",
       "layout": "proposal",
       "title": "Recommended next move",
       "bullets": ["Start with enterprise pilot", "Use current case studies", "Review results after 45 days"]
@@ -852,13 +897,18 @@ const Index = () => {
             <div className="mb-3 grid gap-3 border border-border bg-muted/50 p-3 text-xs leading-5 text-muted-foreground md:grid-cols-[0.85fr_1.15fr]">
               <div>
                 <p className="font-black text-foreground">How JSON should look</p>
-                <p className="mt-1">Use one object with <span className="font-mono">title</span>, <span className="font-mono">subtitle</span>, and a <span className="font-mono">slides</span> array. Every slide needs a <span className="font-mono">layout</span> and <span className="font-mono">title</span>.</p>
+                <p className="mt-1">Use one object with <span className="font-mono">title</span>, <span className="font-mono">subtitle</span>, and a <span className="font-mono">slides</span> array. One <span className="font-mono">{"{ }"}</span> inside slides means one slide. Choose <span className="font-mono">layout</span> first, then add only that layout’s inputs.</p>
               </div>
               <pre className="overflow-auto border border-border bg-background p-2 font-mono text-[11px] text-foreground">{`{
   "title": "Presentation title",
   "subtitle": "Short cover subtitle",
   "slides": [
-    { "layout": "bullets", "title": "Overview", "bullets": ["Point 1", "Point 2"] }
+    {
+      "notes": "Slide 1: one object = one slide",
+      "layout": "bullets",
+      "title": "Overview",
+      "bullets": ["Point 1", "Point 2"]
+    }
   ]
 }`}</pre>
             </div>
