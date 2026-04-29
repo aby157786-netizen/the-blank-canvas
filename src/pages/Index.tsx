@@ -783,6 +783,8 @@ const Index = () => {
                   <div className="mb-3 flex items-center gap-2"><Icon className="h-4 w-4" /><p className="text-sm font-black">{outline.name}</p></div>
                   <p className={`text-xs leading-5 ${selected ? "text-primary-foreground/75" : "text-muted-foreground"}`}>{outline.description}</p>
                   <p className={`mt-3 font-mono text-[11px] ${selected ? "text-primary-foreground/75" : "text-muted-foreground"}`}>{outline.fields}</p>
+                  <MiniLayoutPreview outline={outline} template={activeTemplate} />
+                  <pre className={`mt-3 max-h-28 overflow-auto whitespace-pre-wrap border p-2 font-mono text-[10px] leading-4 ${selected ? "border-primary-foreground/30 bg-primary-foreground/10 text-primary-foreground/80" : "border-border bg-background text-muted-foreground"}`}>{layoutJsonExamples[outline.id]}</pre>
                 </button>
               );
             })}
