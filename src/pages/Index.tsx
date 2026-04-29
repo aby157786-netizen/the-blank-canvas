@@ -179,6 +179,21 @@ const layoutJsonExamples: Record<LayoutType, string> = {
 }`,
 };
 
+const layoutVariants: Record<LayoutType, string[]> = {
+  cover: ["Title + audience", "Title + outcome promise", "Title + source-material context"],
+  bullets: ["Key takeaways", "Problem list", "Recommendation list"],
+  comparison: ["Before vs after", "Option A vs Option B", "Pros and cons"],
+  timeline: ["Date-based roadmap", "Phase-based milestones", "Past-present-future story"],
+  process: ["Step-by-step workflow", "Implementation plan", "Learning sequence"],
+  image: ["Screenshot placeholder", "Diagram placeholder", "Photo or scene placeholder"],
+  cards: ["Feature cards", "Module cards", "Chapter cards"],
+  metrics: ["KPI snapshot", "Research findings", "Impact numbers"],
+  profile: ["Resume profile", "Team profile", "Founder/operator profile"],
+  "idea-wall": ["Brainstorm notes", "Creative concepts", "Workshop clusters"],
+  proposal: ["Problem-solution", "Scope-value", "Ask-next steps"],
+  matrix: ["Feature table", "Decision table", "Evaluation scorecard"],
+};
+
 const uiStyles: UiStyle[] = ["Classic", "Skeuomorphism", "Neobrutalism", "Glassmorphism", "Neumorphism", "Minimalism"];
 
 const layoutOutlines: Outline[] = [
@@ -515,15 +530,11 @@ const createPresentation = async (deck: DeckContent, template: Template) => {
   await pptx.writeFile({ fileName });
 };
 
-const buildPrompt = (template: Template, outline: Outline) => `Create valid JSON for a PowerPoint presentation that will be imported into a JSON-to-PPT web app.
+const buildPrompt = () => `Create valid JSON for a PowerPoint presentation that will be imported into a JSON-to-PPT web app.
 
 Topic: [replace with topic]
 Audience: [replace with audience]
 Goal: [replace with presentation goal]
-Selected design/template: ${template.name}
-Selected scenario: ${template.scenario}
-Selected UI style: ${template.uiStyle}
-Preferred layout type: ${outline.name} (${outline.id})
 Optional materials: [paste notes, article text, curriculum, resume, data, transcript, images needed, or research here]
 
 Return only valid JSON. Do not add markdown, comments, explanations, trailing commas, undefined values, or text outside the JSON.
@@ -550,12 +561,10 @@ Supported layout outlines. For each type, follow the proportion/shape of the JSO
 ${layoutOutlines.map((layout) => `
 For layout "${layout.id}" (${layout.name}) do this:
 - Purpose: ${layout.prompt}
+- Useful outline types: ${layoutVariants[layout.id].join("; ")}
 - Fields/proportion: ${layout.fields}
 - JSON code proportion:
 ${layoutJsonExamples[layout.id]}`).join("\n")}
-
-Design/template guidance:
-${templates.map((item) => `- For the ${item.name} theme (${item.scenario}, ${item.uiStyle}), do this: use it for ${item.bestFor}; prefer ${item.layoutBias.join(", ")} when useful; match the theme with concise titles, balanced slide density, and image placeholders where visuals help.`).join("\n")}
 
 Use this JSON shape:
 {
@@ -563,7 +572,7 @@ Use this JSON shape:
   "subtitle": "Short subtitle for the cover page",
   "slides": [
     {
-      "layout": "${outline.id}",
+      "layout": "choose-one-supported-layout",
       "title": "Slide title",
       "subtitle": "Optional context line",
       "bullets": ["Short point", "Short point", "Short point"],
@@ -615,7 +624,7 @@ const Index = () => {
 
   const activeTemplate = templates.find((template) => template.id === selectedTemplate) ?? templates[0];
   const activeOutline = layoutOutlines.find((outline) => outline.id === selectedOutline) ?? layoutOutlines[0];
-  const aiPrompt = useMemo(() => buildPrompt(activeTemplate, activeOutline), [activeTemplate, activeOutline]);
+  const aiPrompt = useMemo(() => buildPrompt(), []);
   const filteredTemplates = selectedStyle === "All" ? templates : templates.filter((template) => template.uiStyle === selectedStyle);
   const deck = useMemo(() => {
     try {
@@ -782,6 +791,7 @@ const Index = () => {
                 <button key={outline.id} type="button" onClick={() => setSelectedOutline(outline.id)} className={`border p-4 text-left transition-colors ${selected ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:bg-accent"}`}>
                   <div className="mb-3 flex items-center gap-2"><Icon className="h-4 w-4" /><p className="text-sm font-black">{outline.name}</p></div>
                   <p className={`text-xs leading-5 ${selected ? "text-primary-foreground/75" : "text-muted-foreground"}`}>{outline.description}</p>
+                  <p className={`mt-3 text-[11px] font-bold uppercase tracking-wide ${selected ? "text-primary-foreground/80" : "text-muted-foreground"}`}>Types: {layoutVariants[outline.id].join(" · ")}</p>
                   <p className={`mt-3 font-mono text-[11px] ${selected ? "text-primary-foreground/75" : "text-muted-foreground"}`}>{outline.fields}</p>
                   <MiniLayoutPreview outline={outline} template={activeTemplate} />
                   <pre className={`mt-3 max-h-28 overflow-auto whitespace-pre-wrap border p-2 font-mono text-[10px] leading-4 ${selected ? "border-primary-foreground/30 bg-primary-foreground/10 text-primary-foreground/80" : "border-border bg-background text-muted-foreground"}`}>{layoutJsonExamples[outline.id]}</pre>
