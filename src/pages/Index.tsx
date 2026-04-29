@@ -286,22 +286,39 @@ const starterJson = JSON.stringify(
     subtitle: "Short subtitle for the cover page",
     slides: [
       {
+        notes: "Slide 1: one curly-brace object equals one slide. Choose layout first, then use the inputs for that layout.",
+        layout: "cover",
+        title: "Presentation title",
+        subtitle: "Audience + purpose",
+      },
+      {
+        notes: "Slide 2: bullets layout uses bullets[] for dot listing content.",
         layout: "bullets",
         title: "Overview",
-        subtitle: "Optional short context",
         bullets: ["Short point 1", "Short point 2", "Short point 3"],
       },
       {
+        notes: "Slide 3: metrics layout uses metrics[] for numbers, KPIs, dates, or proof points.",
         layout: "metrics",
         title: "Important numbers",
         metrics: ["42%: result or KPI", "12 weeks: timeline", "$1.2M: impact"],
       },
       {
+        notes: "Slide 4: process layout uses steps[] first, then optional bullets[] for explanation below or around the steps.",
+        layout: "process",
+        title: "How it works",
+        subtitle: "Simple explanation before the steps",
+        steps: ["Step 1: start", "Step 2: build", "Step 3: review", "Step 4: launch"],
+        bullets: ["Keep each step short", "Use bullets only for extra explanation"],
+      },
+      {
+        notes: "Slide 5: comparison layout uses comparison[] when content has two sides, options, pros/cons, or before/after.",
         layout: "comparison",
         title: "Options compared",
         comparison: ["Option A: strength", "Option A: risk", "Option B: strength", "Option B: risk"],
       },
       {
+        notes: "Slide 6: image layout uses imagePrompt instead of a fake image URL.",
         layout: "image",
         title: "Visual slide",
         imagePrompt: "Describe the image, chart, diagram, screenshot, or scene needed here",
