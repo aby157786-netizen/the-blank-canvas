@@ -450,17 +450,44 @@ const createPresentation = async (deck: DeckContent, template: Template) => {
   await pptx.writeFile({ fileName });
 };
 
-const buildPrompt = (template: Template, outline: Outline) => `Create JSON for a PowerPoint presentation that will be imported into a JSON-to-PPT web app.
+const buildPrompt = (template: Template, outline: Outline) => `Create valid JSON for a PowerPoint presentation that will be imported into a JSON-to-PPT web app.
 
 Topic: [replace with topic]
 Audience: [replace with audience]
 Goal: [replace with presentation goal]
-Template scenario: ${template.scenario}
-Visual UI style: ${template.uiStyle}
-Preferred layout: ${outline.name}
-Optional materials: [paste notes, article text, curriculum, resume, data, or research here]
+Selected design/template: ${template.name}
+Selected scenario: ${template.scenario}
+Selected UI style: ${template.uiStyle}
+Preferred layout type: ${outline.name} (${outline.id})
+Optional materials: [paste notes, article text, curriculum, resume, data, transcript, images needed, or research here]
 
-Return only valid JSON. Use this shape:
+Return only valid JSON. Do not add markdown, comments, explanations, trailing commas, undefined values, or text outside the JSON.
+
+For the top-level fields do this:
+- For "title": write the main presentation title. Keep it clear and specific.
+- For "subtitle": write one short cover-page support line with audience, angle, or outcome.
+- For "slides": create as many slide objects as the topic needs. Do not force a fixed slide count.
+
+For every slide object do this:
+- For "layout": choose the best value from the supported layout list below. It is not forced to use every layout; use layouts only where they fit the content.
+- For "title": write the slide headline, not a full sentence paragraph.
+- For "subtitle": add optional context only when it helps.
+- For "bullets": use short strings. Avoid long paragraphs because they can overflow in generated PPT slides.
+- For "steps": use ordered milestones, phases, workflow steps, or timeline events.
+- For "comparison": use balanced items for pros/cons, before/after, option A vs B, or alternatives.
+- For "metrics": use measurable facts, KPIs, dates, counts, findings, or proof points.
+- For "cards": use compact ideas, features, modules, or brainstorm notes.
+- For "columns": use table headers or comparison column names.
+- For "rows": use short row values. Keep each row readable.
+- For "imagePrompt": describe the image placeholder that should appear on the slide. Use this when the slide needs a product screenshot, diagram, person, place, chart, process visual, or source-material image.
+
+Supported layout types and what to do for each:
+${layoutOutlines.map((layout) => `- ${layout.id}: ${layout.prompt} Fields: ${layout.fields}.`).join("\n")}
+
+Design/template guidance:
+${templates.map((item) => `- ${item.name} (${item.scenario}, ${item.uiStyle}): best for ${item.bestFor}. Prefer these layouts when useful: ${item.layoutBias.join(", ")}.`).join("\n")}
+
+Use this JSON shape:
 {
   "title": "Presentation title",
   "subtitle": "Short subtitle for the cover page",
@@ -481,13 +508,12 @@ Return only valid JSON. Use this shape:
   ]
 }
 
-Rules:
-- Make 6-10 slides unless the topic requires fewer.
-- Use layout values from: ${layoutOutlines.map((layout) => layout.id).join(", ")}.
-- Prefer ${template.layoutBias.join(", ")} layouts for this template.
-- Keep text concise so it fits on slides.
-- Include imagePrompt when a slide would benefit from a visual or when materials mention images.
-- If source materials are provided, summarize and structure them; do not invent unsupported facts.`;
+Avoid generation problems:
+- Every slide must be an object inside the "slides" array.
+- Arrays must contain strings, not nested objects, unless the information is converted into readable text.
+- Keep titles, bullets, metrics, cards, rows, and comparisons concise so the generated PPT does not clip text.
+- If source materials are provided, summarize and structure them; do not invent unsupported facts.
+- If an image is mentioned but no image file is available, write an "imagePrompt" instead of an image URL.`;
 
 const Index = () => {
   const [jsonText, setJsonText] = useState(sampleJson);
