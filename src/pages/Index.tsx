@@ -568,10 +568,10 @@ const addContentSlide = (pptx: pptxgen, item: SlideContent, template: Template, 
     slide.addShape("ellipse", { x: -0.8, y: 5.2, w: 2.5, h: 2.5, fill: { color: template.colors.accent, transparency: 55 }, line: { color: template.colors.accent, transparency: 100 } });
   }
 
-  if (layout === "comparison" || layout === "proposal") addComparisonSlide(slide, item, template);
+  if (layout === "comparison" || layout === "proposal" || layout === "two-content") addComparisonSlide(slide, item, template);
   else if (layout === "timeline") addTimelineSlide(slide, item, template);
   else if (layout === "process") addProcessSlide(slide, item, template);
-  else if (layout === "image") addImageSlide(slide, item, template);
+  else if (layout === "image" || layout === "content-caption") addImageSlide(slide, item, template);
   else if (layout === "cards" || layout === "idea-wall" || layout === "profile") addCardsSlide(slide, item, template, layout === "profile" ? "cards" : layout);
   else if (layout === "metrics") addMetricsSlide(slide, item, template);
   else if (layout === "matrix") addMatrixSlide(slide, item, template);
@@ -610,6 +610,7 @@ Think of the deck like this:
 2. The object has a main "title", a short "subtitle", and a "slides" array.
 3. Each item inside "slides" is one PowerPoint slide.
 4. Each slide chooses one layout, then uses only the fields that make sense for that layout.
+5. Layouts are not a fixed template order. You can use them together in one PPT, duplicate the same layout many times, skip layouts, or rearrange them based on the content.
 
 The required overall structure is:
 {
@@ -638,6 +639,9 @@ Natural writing rules for this JSON:
 - It is okay to skip layouts that do not fit the topic.
 - It is not required to use every layout.
 - You may combine helpful fields, for example an "image" slide can include both "imagePrompt" and "bullets".
+- Choose layouts from the content properties: use "bullets" when the content is a list, "process" or "timeline" when the content is ordered, "comparison" or "two-content" when the content has two sides, "metrics" when it has numbers, and "image" or "content-caption" when a visual is needed.
+- A deck can include more than one cover-like slide: use "cover" for the first slide, "section-header" for chapter openers, and "title-only" for simple transitions.
+- For process slides, place the main steps first, then use "subtitle" or "bullets" for the explanation above, below, or beside the steps.
 
 Supported fields:
 - Top-level fields: "title", "subtitle", "slides".
@@ -656,6 +660,7 @@ Use the standard field names when possible:
 - Use "imagePrompt" for any visual placeholder.
 
 Supported layouts and how to use them:
+Use these as building blocks. A good deck usually combines several layout values, for example: cover, section-header, title-content, bullets, two-content, process, metrics, content-caption, and proposal. If the source content repeats the same kind of information, duplicate the matching layout instead of forcing a different one.
 ${layoutOutlines.map((layout) => `
 Layout value: "${layout.id}"
 Layout name: ${layout.name}
@@ -672,9 +677,25 @@ Here is a complete example of good JSON:
   "subtitle": "Opportunities, risks, and launch priorities",
   "slides": [
     {
+      "layout": "cover",
+      "title": "Market Expansion Plan",
+      "subtitle": "Opportunities, risks, and launch priorities"
+    },
+    {
+      "layout": "section-header",
+      "title": "Where we stand",
+      "subtitle": "Current evidence before choosing the launch path"
+    },
+    {
       "layout": "metrics",
       "title": "Current position",
       "metrics": ["18%: revenue growth", "3.4x: pipeline coverage", "6 pts: retention lift"]
+    },
+    {
+      "layout": "two-content",
+      "title": "Audience signals and barriers",
+      "columns": ["Signals", "Barriers"],
+      "bullets": ["High demand in regulated teams", "Strong referral activity", "Longer procurement cycles", "More onboarding support needed"]
     },
     {
       "layout": "comparison",
@@ -685,6 +706,13 @@ Here is a complete example of good JSON:
       "layout": "timeline",
       "title": "Launch roadmap",
       "steps": ["Month 1: validate segment", "Month 2: build campaign", "Month 3: pilot", "Month 4: scale"]
+    },
+    {
+      "layout": "process",
+      "title": "Pilot operating steps",
+      "subtitle": "Run the pilot in a controlled sequence, then review before scaling.",
+      "steps": ["Select accounts", "Prepare assets", "Launch outreach", "Track adoption", "Review results"],
+      "bullets": ["Keep weekly checkpoints", "Use the same success criteria for every account"]
     },
     {
       "layout": "image",
