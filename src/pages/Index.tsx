@@ -707,43 +707,50 @@ Natural instruction: ${layout.prompt}
 JSON example:
 ${layoutJsonExamples[layout.id]}`).join("\n")}
 
-Here is a complete example of good JSON:
+Here is a complete example of good JSON. Notice: every { } inside "slides" is one slide, and the "notes" field is used like an easy comment so the JSON stays valid:
 {
   "title": "Market Expansion Plan",
   "subtitle": "Opportunities, risks, and launch priorities",
   "slides": [
     {
+      "notes": "Slide 1: cover layout uses only title and subtitle.",
       "layout": "cover",
       "title": "Market Expansion Plan",
       "subtitle": "Opportunities, risks, and launch priorities"
     },
     {
+      "notes": "Slide 2: section-header layout starts a new part of the PPT.",
       "layout": "section-header",
       "title": "Where we stand",
       "subtitle": "Current evidence before choosing the launch path"
     },
     {
+      "notes": "Slide 3: metrics layout needs metrics[] because the content is numbers.",
       "layout": "metrics",
       "title": "Current position",
       "metrics": ["18%: revenue growth", "3.4x: pipeline coverage", "6 pts: retention lift"]
     },
     {
+      "notes": "Slide 4: two-content layout uses columns[] plus bullets[] split between the two sides.",
       "layout": "two-content",
       "title": "Audience signals and barriers",
       "columns": ["Signals", "Barriers"],
       "bullets": ["High demand in regulated teams", "Strong referral activity", "Longer procurement cycles", "More onboarding support needed"]
     },
     {
+      "notes": "Slide 5: comparison layout is for options, pros/cons, or before/after.",
       "layout": "comparison",
       "title": "Expansion options",
       "comparison": ["Enterprise: higher ACV", "Enterprise: longer sales cycle", "SMB: faster adoption", "SMB: higher churn risk"]
     },
     {
+      "notes": "Slide 6: timeline layout uses steps[] in time order.",
       "layout": "timeline",
       "title": "Launch roadmap",
       "steps": ["Month 1: validate segment", "Month 2: build campaign", "Month 3: pilot", "Month 4: scale"]
     },
     {
+      "notes": "Slide 7: process layout uses steps[] on top and bullets[] for explanation below.",
       "layout": "process",
       "title": "Pilot operating steps",
       "subtitle": "Run the pilot in a controlled sequence, then review before scaling.",
@@ -751,12 +758,14 @@ Here is a complete example of good JSON:
       "bullets": ["Keep weekly checkpoints", "Use the same success criteria for every account"]
     },
     {
+      "notes": "Slide 8: image layout uses imagePrompt when there is no real image file or URL.",
       "layout": "image",
       "title": "Customer workflow",
       "imagePrompt": "Diagram showing the customer journey from signup to activation",
       "bullets": ["Show friction points", "Highlight activation moment"]
     },
     {
+      "notes": "Slide 9: proposal layout uses bullets[] for problem, solution, value, and next move.",
       "layout": "proposal",
       "title": "Recommended next move",
       "bullets": ["Start with enterprise pilot", "Use current case studies", "Review results after 45 days"]
